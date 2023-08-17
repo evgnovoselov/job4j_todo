@@ -17,6 +17,7 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Integer id;
+    private String title;
     private String description;
     private LocalDateTime created;
     private Boolean done;
