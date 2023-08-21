@@ -1,10 +1,21 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+<!doctype html>
+<html lang="ru" xmlns:th="https://www.thymeleaf.org">
+<head th:replace="~{fragments/main :: head(_)}">
 </head>
 <body>
-404
+<th:block th:replace="~{fragments/main :: menu(_)}"></th:block>
+
+<div class="container">
+    <h1>Произошла ошибка</h1>
+    <div class="alert alert-danger" role="alert" th:if="${message}" th:text="${message}">
+        Произошла ошибка.
+    </div>
+    <p>Перейти в раздел:</p>
+    <ul>
+        <li><a th:href="@{/}">Главная</a></li>
+    </ul>
+</div>
+
+<th:block th:replace="~{fragments/main :: libsBeforeEndBody}"></th:block>
 </body>
 </html>
