@@ -1,27 +1,41 @@
 <!doctype html>
 <html lang="ru" xmlns:th="https://www.thymeleaf.org">
-<head th:replace="~{fragments/main :: head(_)}">
+<head th:replace="~{fragments/main :: head(~{::title})}">
+    <title>Задачи</title>
 </head>
 <body>
 <th:block th:replace="~{fragments/main :: menu('home')}"></th:block>
 
 <div class="container">
     <h1>Задачи</h1>
+    <a th:href="@{/}" class="btn btn-primary" role="button">Добавить задание</a>
+    <h2>Список заданий</h2>
+    <div>
+        <span>Фильтр:</span>
+        <ul class="list-inline">
+            <li class="list-inline-item"><a th:href="@{/}">Все</a></li>
+            <li class="list-inline-item"><a th:href="@{/}">Выполненные</a></li>
+            <li class="list-inline-item"><a th:href="@{/}">Новые</a></li>
+        </ul>
+    </div>
     <table class="table table-striped table-hover">
         <thead>
         <tr>
             <th scope="col">#</th>
-            <th scope="col">Выполнена</th>
+            <th scope="col">Выполнено</th>
             <th scope="col">Название</th>
             <th scope="col">Создана</th>
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
+        <tr th:each="task : ${tasks}">
+            <th scope="row" th:text="${task.id}">1</th>
+            <td>
+                <i th:if="${task.done}" class="bi bi-check-square"></i>
+                <i th:if="not ${task.done}" class="bi bi-square"></i>
+            </td>
+            <td><a th:href="@{/tasks/{taskId}(taskId=${task.id})}" th:text="${task.title}">Задача</a></td>
+            <td th:text="${#temporals.format(task.created, 'dd.MM.yyyy HH:mm')}">21.08.2023 13:37</td>
         </tr>
         </tbody>
     </table>
