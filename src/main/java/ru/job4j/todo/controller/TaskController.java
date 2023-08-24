@@ -15,7 +15,7 @@ public class TaskController {
 
     @GetMapping()
     public String getAll(Model model) {
-        model.addAttribute("tasks", taskService.findAll());
+        model.addAttribute("tasks", taskService.findAllByOrderByCreatedDesc());
         return "tasks/list";
     }
 }

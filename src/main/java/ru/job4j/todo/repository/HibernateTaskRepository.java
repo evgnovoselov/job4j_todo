@@ -32,18 +32,18 @@ public class HibernateTaskRepository implements TaskRepository {
     }
 
     @Override
-    public Collection<Task> findAll() {
-        return fromTransaction(session -> session.createQuery("from Task", Task.class).list());
+    public Collection<Task> findAllByOrderByCreatedDesc() {
+        return fromTransaction(session -> session.createQuery("from Task order by created desc", Task.class).list());
     }
 
     @Override
-    public Collection<Task> findAllByDone() {
-        return fromTransaction(session -> session.createQuery("from Task where done = true", Task.class).list());
+    public Collection<Task> findAllByDoneTrueOrderByCreatedDesc() {
+        return fromTransaction(session -> session.createQuery("from Task where done = true order by created desc", Task.class).list());
     }
 
     @Override
-    public Collection<Task> findAllByNotDone() {
-        return fromTransaction(session -> session.createQuery("from Task where done = false", Task.class).list());
+    public Collection<Task> findAllByDoneFalseOrderByCreatedDesc() {
+        return fromTransaction(session -> session.createQuery("from Task where done = false order by created desc", Task.class).list());
     }
 
     @Override

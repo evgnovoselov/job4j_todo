@@ -13,7 +13,7 @@ public class SimpleTaskService implements TaskService {
     private final TaskRepository taskRepository;
 
     @Override
-    public Collection<Task> findAll() {
-        return taskRepository.findAll();
+    public Collection<Task> findAllByOrderByCreatedDesc() {
+        return taskRepository.findAllByOrderByCreatedDesc();
     }
 }

@@ -10,11 +10,11 @@ public interface TaskRepository {
 
     boolean update(Task task);
 
-    Collection<Task> findAll();
+    Collection<Task> findAllByOrderByCreatedDesc();
 
-    Collection<Task> findAllByDone();
+    Collection<Task> findAllByDoneTrueOrderByCreatedDesc();
 
-    Collection<Task> findAllByNotDone();
+    Collection<Task> findAllByDoneFalseOrderByCreatedDesc();
 
     Optional<Task> findById(int id);
 
