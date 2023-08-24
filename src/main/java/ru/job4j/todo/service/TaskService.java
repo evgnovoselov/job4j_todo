@@ -6,4 +6,8 @@ import java.util.Collection;
 
 public interface TaskService {
     Collection<Task> findAllByOrderByCreatedDesc();
+
+    Collection<Task> findAllByDoneTrueOrderByCreatedDesc();
+
+    Collection<Task> findAllByDoneFalseOrderByCreatedDesc();
 }

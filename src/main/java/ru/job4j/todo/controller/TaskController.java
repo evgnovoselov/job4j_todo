@@ -18,4 +18,16 @@ public class TaskController {
         model.addAttribute("tasks", taskService.findAllByOrderByCreatedDesc());
         return "tasks/list";
     }
+
+    @GetMapping("/new")
+    public String getAllNew(Model model) {
+        model.addAttribute("tasks", taskService.findAllByDoneFalseOrderByCreatedDesc());
+        return "tasks/list";
+    }
+
+    @GetMapping("/done")
+    public String getAllDone(Model model) {
+        model.addAttribute("tasks", taskService.findAllByDoneTrueOrderByCreatedDesc());
+        return "tasks/list";
+    }
 }

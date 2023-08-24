@@ -16,4 +16,15 @@ public class SimpleTaskService implements TaskService {
     public Collection<Task> findAllByOrderByCreatedDesc() {
         return taskRepository.findAllByOrderByCreatedDesc();
     }
+
+    @Override
+    public Collection<Task> findAllByDoneTrueOrderByCreatedDesc() {
+        return taskRepository.findAllByDoneTrueOrderByCreatedDesc();
+    }
+
+    @Override
+    public Collection<Task> findAllByDoneFalseOrderByCreatedDesc() {
+        return taskRepository.findAllByDoneFalseOrderByCreatedDesc();
+    }
+
 }
