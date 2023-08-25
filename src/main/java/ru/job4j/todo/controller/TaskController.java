@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.service.TaskService;
@@ -44,5 +45,22 @@ public class TaskController {
         }
         model.addAttribute("task", taskOptional.get());
         return "tasks/one";
+    }
+
+    @GetMapping("/create")
+    public String create(Model model) {
+        model.addAttribute("task", new Task());
+        return "tasks/create";
+    }
+
+    @PostMapping("/create")
+    public String processCreate(Task task, Model model) {
+        boolean isSave = taskService.save(task);
+        if (!isSave) {
+            model.addAttribute("hasAlert", true);
+            model.addAttribute("task", task);
+            return "tasks/create";
+        }
+        return "redirect:/tasks/%s".formatted(task.getId());
     }
 }

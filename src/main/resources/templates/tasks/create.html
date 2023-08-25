@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru" xmlns:th="https://www.thymeleaf.org">
+<head th:replace="~{fragments/main :: head(~{::title})}">
+    <title>Задачи</title>
+</head>
+<body>
+<th:block th:replace="~{fragments/main :: menu('home')}"></th:block>
+
+<div class="container">
+    <h1>Создание задачи</h1>
+    <div class="alert alert-danger" role="alert" th:if="${hasAlert}">
+        Не удалось выполнить операцию, попробуйте изменить данные или повторить попытку.
+    </div>
+    <form th:action="@{/tasks/create}" th:object="${task}" method="post">
+        <div class="mb-3">
+            <label for="inputTitle" class="form-label">Название</label>
+            <input type="text" class="form-control" id="inputTitle" aria-describedby="titleHelp" required
+                   th:field="*{title}">
+            <div id="titleHelp" class="form-text">Введите название задачи</div>
+        </div>
+        <div class="mb-3">
+            <label for="textareaDescription" class="form-label">Описание</label>
+            <textarea class="form-control" id="textareaDescription" rows="3" required
+                      aria-describedby="descriptionHelp" th:field="*{description}"></textarea>
+            <div id="descriptionHelp" class="form-text">Введите описание задачи</div>
+        </div>
+        <button type="submit" class="btn btn-primary">Добавить</button>
+    </form>
+</div>
+
+<th:block th:replace="~{fragments/main :: libsBeforeEndBody}"></th:block>
+</body>
+</html>

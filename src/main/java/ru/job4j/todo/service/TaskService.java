@@ -13,4 +13,6 @@ public interface TaskService {
     Collection<Task> findAllByDoneFalseOrderByCreatedDesc();
 
     Optional<Task> findById(int id);
+
+    boolean save(Task task);
 }
