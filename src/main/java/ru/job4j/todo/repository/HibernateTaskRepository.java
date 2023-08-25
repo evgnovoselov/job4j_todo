@@ -48,7 +48,7 @@ public class HibernateTaskRepository implements TaskRepository {
 
     @Override
     public Optional<Task> findById(int id) {
-        return Optional.of(fromTransaction(session -> session.get(Task.class, id)));
+        return Optional.ofNullable(fromTransaction(session -> session.get(Task.class, id)));
     }
 
     @Override

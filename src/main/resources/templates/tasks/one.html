@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ru" xmlns:th="https://www.thymeleaf.org">
+<head th:replace="~{fragments/main :: head(~{::title})}">
+    <title>Задачи</title>
+</head>
+<body>
+<th:block th:replace="~{fragments/main :: menu('home')}"></th:block>
+
+<div class="container">
+    <h1>Задача: <span th:text="${task.title}">Название задачи</span></h1>
+    <table class="table table-bordered table-striped table-hover">
+        <tbody>
+        <tr>
+            <th scope="row">Идентификатор</th>
+            <td th:text="${task.id}">Значение</td>
+        </tr>
+        <tr>
+            <th scope="row">Название</th>
+            <td th:text="${task.title}">Значение</td>
+        </tr>
+        <tr>
+            <th scope="row">Создана</th>
+            <td th:text="${#temporals.format(task.created,'dd.MM.yyyy HH:mm')}">Значение</td>
+        </tr>
+        <tr>
+            <th scope="row">Статус</th>
+            <td th:if="${task.done}" class="text-success"><b>Выполнена</b></td>
+            <td th:if="not ${task.done}" class="text-danger"><b>Не выполнена</b></td>
+        </tr>
+        </tbody>
+    </table>
+    <h2>Описание</h2>
+    <p th:text="${task.description}">Текст задачи</p>
+</div>
+
+<th:block th:replace="~{fragments/main :: libsBeforeEndBody}"></th:block>
+</body>
+</html>

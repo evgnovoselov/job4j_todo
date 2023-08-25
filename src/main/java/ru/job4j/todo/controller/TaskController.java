@@ -4,8 +4,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import ru.job4j.todo.model.Task;
 import ru.job4j.todo.service.TaskService;
+
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/tasks")
@@ -29,5 +33,16 @@ public class TaskController {
     public String getAllDone(Model model) {
         model.addAttribute("tasks", taskService.findAllByDoneTrueOrderByCreatedDesc());
         return "tasks/list";
+    }
+
+    @GetMapping("/{id}")
+    public String getById(@PathVariable int id, Model model) {
+        Optional<Task> taskOptional = taskService.findById(id);
+        if (taskOptional.isEmpty()) {
+            model.addAttribute("message", "Задача не найдена.");
+            return "error/404";
+        }
+        model.addAttribute("task", taskOptional.get());
+        return "tasks/one";
     }
 }
