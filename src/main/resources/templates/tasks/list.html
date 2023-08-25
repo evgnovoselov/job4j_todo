@@ -8,7 +8,7 @@
 
 <div class="container">
     <h1>Задачи</h1>
-    <a th:href="@{/}" class="btn btn-primary" role="button">Добавить задание</a>
+    <a th:href="@{/tasks/create}" class="btn btn-primary" role="button">Добавить задание</a>
     <h2>Список заданий</h2>
     <div>
         <span>Фильтр:</span>
@@ -22,7 +22,7 @@
         <thead>
         <tr>
             <th scope="col">#</th>
-            <th scope="col">Выполнено</th>
+            <th scope="col">Статус</th>
             <th scope="col">Название</th>
             <th scope="col"><i class="bi bi-arrow-down"></i> Создана</th>
         </tr>
@@ -31,8 +31,8 @@
         <tr th:each="task : ${tasks}">
             <th scope="row" th:text="${task.id}">1</th>
             <td>
-                <i th:if="${task.done}" class="bi bi-check-square"></i>
-                <i th:if="not ${task.done}" class="bi bi-square"></i>
+                <i th:if="${task.done}" class="bi bi-check-square text-success"></i>
+                <i th:if="not ${task.done}" class="bi bi-square text-danger"></i>
             </td>
             <td><a th:href="@{/tasks/{taskId}(taskId=${task.id})}" th:text="${task.title}">Задача</a></td>
             <td th:text="${#temporals.format(task.created, 'dd.MM.yyyy HH:mm')}">21.08.2023 13:37</td>
