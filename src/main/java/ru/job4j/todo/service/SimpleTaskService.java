@@ -43,4 +43,9 @@ public class SimpleTaskService implements TaskService {
         task.setDone(false);
         return taskRepository.save(task);
     }
+
+    @Override
+    public boolean setStatusById(int id, boolean done) {
+        return taskRepository.setStatusById(id, done);
+    }
 }

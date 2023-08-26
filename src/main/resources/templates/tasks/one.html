@@ -8,11 +8,19 @@
 
 <div class="container">
     <h1>Задача: <span th:text="${task.title}">Название задачи</span></h1>
+    <div class="alert alert-danger" role="alert" th:if="${hasAlert}">
+        Не удалось выполнить операцию, попробуйте изменить данные или повторить попытку.
+    </div>
     <div>
-        <form th:action="@{/tasks/done}" th:object="${task}" method="post" class="d-inline"
-              onsubmit="return confirm('Отметить данную задачу выполненной?');">
-            <input type="hidden" th:field="*{id}">
+        <form th:action="@{/tasks/{id}/set-status(id=${task.id})}" method="post" class="d-inline"
+              th:if="not ${task.done}" onsubmit="return confirm('Отметить данную задачу выполненной?');">
+            <input type="hidden" name="done" value="true">
             <button type="submit" class="btn btn-success mb-2">Выполнена</button>
+        </form>
+        <form th:action="@{/tasks/{id}/set-status(id=${task.id})}" method="post" class="d-inline" th:if="${task.done}"
+              onsubmit="return confirm('Отметить данную задачу не выполненной?');">
+            <input type="hidden" name="done" value="false">
+            <button type="submit" class="btn btn-warning mb-2">Не выполнена</button>
         </form>
         <a th:href="@{/tasks/{id}/edit(id=${task.id})}" class="btn btn-primary mb-2" role="button">Редактировать</a>
         <form th:action="@{/tasks/delete}" th:object="${task}" method="post" class="d-inline"

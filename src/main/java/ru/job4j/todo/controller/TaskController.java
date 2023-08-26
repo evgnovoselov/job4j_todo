@@ -3,10 +3,7 @@ package ru.job4j.todo.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.service.TaskService;
 
@@ -62,5 +59,15 @@ public class TaskController {
             return "tasks/create";
         }
         return "redirect:/tasks/%s".formatted(task.getId());
+    }
+
+    @PostMapping("/{id}/set-status")
+    public String processSetStatus(@PathVariable int id, @RequestParam boolean done, Model model) {
+        boolean hasChange = taskService.setStatusById(id, done);
+        if (!hasChange) {
+            model.addAttribute("hasAlert", true);
+            return getById(id, model);
+        }
+        return "redirect:/tasks/%s".formatted(id);
     }
 }

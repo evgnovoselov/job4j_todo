@@ -19,4 +19,6 @@ public interface TaskRepository {
     Optional<Task> findById(int id);
 
     boolean deleteById(int id);
+
+    boolean setStatusById(int id, boolean done);
 }

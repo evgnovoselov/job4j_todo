@@ -15,4 +15,6 @@ public interface TaskService {
     Optional<Task> findById(int id);
 
     boolean save(Task task);
+
+    boolean setStatusById(int id, boolean done);
 }

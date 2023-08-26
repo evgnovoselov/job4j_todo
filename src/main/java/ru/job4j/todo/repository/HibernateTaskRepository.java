@@ -61,6 +61,17 @@ public class HibernateTaskRepository implements TaskRepository {
         }) != null;
     }
 
+    @Override
+    public boolean setStatusById(int id, boolean done) {
+        return fromTransaction(session -> {
+            session.createMutationQuery("update Task set done = :done where id = :id")
+                    .setParameter("done", done)
+                    .setParameter("id", id)
+                    .executeUpdate();
+            return true;
+        }) != null;
+    }
+
     private <R> R fromTransaction(Function<Session, R> action) {
         R result = null;
         Session session = sf.openSession();
