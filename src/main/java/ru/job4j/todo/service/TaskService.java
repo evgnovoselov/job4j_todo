@@ -17,4 +17,6 @@ public interface TaskService {
     boolean save(Task task);
 
     boolean setStatusById(int id, boolean done);
+
+    boolean deleteById(int id);
 }

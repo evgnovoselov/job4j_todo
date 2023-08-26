@@ -70,4 +70,15 @@ public class TaskController {
         }
         return "redirect:/tasks/%s".formatted(id);
     }
+
+    @PostMapping("/{id}/delete")
+    public String processDeleteById(@PathVariable int id, Model model) {
+        boolean hasChange = taskService.deleteById(id);
+        if (!hasChange) {
+            model.addAttribute("hasAlert", true);
+            return getById(id, model);
+        }
+        model.addAttribute("successDeleteAlert", true);
+        return "tasks/successDelete";
+    }
 }
