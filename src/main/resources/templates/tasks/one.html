@@ -8,6 +8,19 @@
 
 <div class="container">
     <h1>Задача: <span th:text="${task.title}">Название задачи</span></h1>
+    <div>
+        <form th:action="@{/tasks/done}" th:object="${task}" method="post" class="d-inline"
+              onsubmit="return confirm('Отметить данную задачу выполненной?');">
+            <input type="hidden" th:field="*{id}">
+            <button type="submit" class="btn btn-success mb-2">Выполнена</button>
+        </form>
+        <a th:href="@{/tasks/{id}/edit(id=${task.id})}" class="btn btn-primary mb-2" role="button">Редактировать</a>
+        <form th:action="@{/tasks/delete}" th:object="${task}" method="post" class="d-inline"
+              onsubmit="return confirm('Вы уверены, что хотите удалить?');">
+            <input type="hidden" th:field="*{id}">
+            <button type="submit" class="btn btn-danger mb-2">Удалить</button>
+        </form>
+    </div>
     <table class="table table-bordered table-striped table-hover">
         <tbody>
         <tr>
