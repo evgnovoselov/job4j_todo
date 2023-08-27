@@ -24,6 +24,8 @@
             <div class="navbar-nav me-auto">
                 <a th:with="page='home'" class="nav-link" th:classappend="${page==active ? 'active':''}"
                    th:aria-current="${page==active ? 'page':''}" th:href="@{/}">Главная</a>
+                <a th:with="page='tasks'" class="nav-link" th:classappend="${page==active ? 'active':''}"
+                   th:aria-current="${page==active ? 'page':''}" th:href="@{/tasks}">Задачи</a>
             </div>
         </div>
     </div>

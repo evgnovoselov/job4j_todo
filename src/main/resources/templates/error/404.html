@@ -1,9 +1,10 @@
 <!doctype html>
 <html lang="ru" xmlns:th="https://www.thymeleaf.org">
-<head th:replace="~{fragments/main :: head(_)}">
+<head th:replace="~{fragments/main :: head(~{::title})}">
+    <title>Ошибка</title>
 </head>
 <body>
-<th:block th:replace="~{fragments/main :: menu(_)}"></th:block>
+<th:block th:replace="~{fragments/main :: menu('none')}"></th:block>
 
 <div class="container">
     <h1>Произошла ошибка</h1>

@@ -4,7 +4,7 @@
     <title>Задачи</title>
 </head>
 <body>
-<th:block th:replace="~{fragments/main :: menu('home')}"></th:block>
+<th:block th:replace="~{fragments/main :: menu('none')}"></th:block>
 
 <div class="container">
     <h1>Создание задачи</h1>
@@ -24,7 +24,8 @@
                       aria-describedby="descriptionHelp" th:field="*{description}"></textarea>
             <div id="descriptionHelp" class="form-text">Введите описание задачи</div>
         </div>
-        <button type="submit" class="btn btn-primary">Добавить</button>
+        <button type="submit" class="btn btn-success">Добавить</button>
+        <a th:href="@{/tasks}" class="btn btn-primary" role="button">Вернуться</a>
     </form>
 </div>
 
