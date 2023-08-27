@@ -16,7 +16,7 @@
             <a th:href="@{/tasks}" class="btn btn-primary mb-2" role="button">Вернуться к списку задач</a>
         </div>
         <form th:action="@{/tasks/{id}/set-status(id=${task.id})}" method="post" class="d-inline"
-              th:if="not ${task.done}" onsubmit="return confirm('Отметить данную задачу выполненной?');">
+              th:if="not ${task.done}">
             <input type="hidden" name="done" value="true">
             <button type="submit" class="btn btn-success mb-2">Выполнена</button>
         </form>
@@ -25,7 +25,7 @@
             <input type="hidden" name="done" value="false">
             <button type="submit" class="btn btn-warning mb-2">Не выполнена</button>
         </form>
-        <a th:href="@{/tasks/{id}/edit(id=${task.id})}" class="btn btn-primary mb-2" role="button">Редактировать</a>
+        <a th:href="@{/tasks/{id}/update(id=${task.id})}" class="btn btn-primary mb-2" role="button">Редактировать</a>
         <div class="float-end">
             <form th:action="@{/tasks/{id}/delete(id=${task.id})}" method="post" class="d-inline"
                   onsubmit="return confirm('Вы уверены, что хотите удалить?');">

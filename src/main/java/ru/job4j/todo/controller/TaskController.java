@@ -81,4 +81,26 @@ public class TaskController {
         model.addAttribute("successDeleteAlert", true);
         return "tasks/successDelete";
     }
+
+    @GetMapping("/{id}/update")
+    public String updateById(@PathVariable int id, Model model) {
+        Optional<Task> taskOptional = taskService.findById(id);
+        if (taskOptional.isEmpty()) {
+            model.addAttribute("message", "Задача не найдена.");
+            return "error/404";
+        }
+        model.addAttribute("task", taskOptional.get());
+        return "tasks/update";
+    }
+
+    @PostMapping("/{id}/update")
+    public String processUpdate(Task task, @PathVariable int id, Model model) {
+        boolean hasChange = taskService.update(task);
+        if (!hasChange) {
+            model.addAttribute("hasAlert", true);
+            model.addAttribute("task", task);
+            return "tasks/update";
+        }
+        return "redirect:/tasks/%s".formatted(id);
+    }
 }

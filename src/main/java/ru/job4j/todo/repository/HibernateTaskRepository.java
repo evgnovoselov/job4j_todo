@@ -26,9 +26,19 @@ public class HibernateTaskRepository implements TaskRepository {
 
     @Override
     public boolean update(Task task) {
+        String hql = """
+                update Task
+                set title = :title, description = :description, done = :done
+                where id = :id
+                """;
         return fromTransaction(session -> {
-            session.merge(task);
-            return true;
+            int changed = session.createMutationQuery(hql)
+                    .setParameter("title", task.getTitle())
+                    .setParameter("description", task.getDescription())
+                    .setParameter("done", task.getDone())
+                    .setParameter("id", task.getId())
+                    .executeUpdate();
+            return changed > 0;
         }).orElse(false);
     }
 
