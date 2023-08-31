@@ -78,7 +78,6 @@ public class TaskController {
             model.addAttribute("hasAlert", true);
             return getById(id, model);
         }
-        model.addAttribute("successDeleteAlert", true);
         return "tasks/successDelete";
     }
 
