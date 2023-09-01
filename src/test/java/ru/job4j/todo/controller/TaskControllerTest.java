@@ -6,7 +6,6 @@ import org.springframework.ui.ConcurrentModel;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.service.TaskService;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static ru.job4j.todo.util.TaskUtil.makeTask;
 
 class TaskControllerTest {
     private TaskController taskController;
@@ -24,17 +24,6 @@ class TaskControllerTest {
     void setUp() {
         taskService = mock(TaskService.class);
         taskController = new TaskController(taskService);
-    }
-
-    private Task makeTask(int seed, boolean done) {
-        LocalDateTime dateTime = LocalDateTime.of(2023, 8, 1, 8, 10);
-        Task task = new Task();
-        task.setId(seed);
-        task.setTitle("Task title " + seed);
-        task.setDescription("Task description " + seed);
-        task.setCreated(dateTime);
-        task.setDone(done);
-        return task;
     }
 
     @Test
