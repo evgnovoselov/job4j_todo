@@ -36,7 +36,7 @@ public class SimpleTaskService implements TaskService {
 
     @Override
     public boolean save(Task task) {
-        if (task.getTitle().isBlank()) {
+        if (task.getTitle() == null || task.getTitle().isBlank()) {
             task.setTitle("Задача без названия");
         }
         task.setCreated(LocalDateTime.now());
