@@ -92,13 +92,15 @@ public class HibernateTaskRepository implements TaskRepository {
     private <R> Optional<R> fromTransaction(Function<Session, R> action) {
         Optional<R> result = Optional.empty();
         Session session = sf.openSession();
-        try (session) {
+        try {
             session.beginTransaction();
             Optional<R> apply = Optional.ofNullable(action.apply(session));
             session.getTransaction().commit();
             result = apply;
         } catch (Exception e) {
             session.getTransaction().rollback();
+        } finally {
+            session.close();
         }
         return result;
     }
