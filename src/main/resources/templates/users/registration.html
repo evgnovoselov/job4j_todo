@@ -8,6 +8,9 @@
 
 <div class="container">
     <h1>Регистрация пользователя</h1>
+    <div class="alert alert-danger" role="alert" th:if="${error}" th:text="${error}">
+        Произошла ошибка!
+    </div>
     <form th:action="@{/users/registration}" th:object="${user}" method="post">
         <div class="mb-3">
             <label for="inputName" class="form-label">Имя</label>
