@@ -20,13 +20,8 @@ public class SimpleTaskService implements TaskService {
     }
 
     @Override
-    public Collection<Task> findAllByDoneTrueOrderByCreatedDesc() {
-        return taskRepository.findAllByDoneTrueOrderByCreatedDesc();
-    }
-
-    @Override
-    public Collection<Task> findAllByDoneFalseOrderByCreatedDesc() {
-        return taskRepository.findAllByDoneFalseOrderByCreatedDesc();
+    public Collection<Task> findAllByDoneOrderByCreatedDesc(boolean done) {
+        return taskRepository.findAllByDoneOrderByCreatedDesc(done);
     }
 
     @Override
@@ -40,7 +35,6 @@ public class SimpleTaskService implements TaskService {
             task.setTitle("Задача без названия");
         }
         task.setCreated(LocalDateTime.now());
-        task.setDone(false);
         return taskRepository.save(task);
     }
 
@@ -56,6 +50,11 @@ public class SimpleTaskService implements TaskService {
 
     @Override
     public boolean update(Task task) {
+        Optional<Task> oldTask = taskRepository.findById(task.getId());
+        if (oldTask.isEmpty()) {
+            return false;
+        }
+        task.setCreated(oldTask.get().getCreated());
         return taskRepository.update(task);
     }
 }

@@ -23,13 +23,13 @@ public class TaskController {
 
     @GetMapping("/new")
     public String getAllNew(Model model) {
-        model.addAttribute("tasks", taskService.findAllByDoneFalseOrderByCreatedDesc());
+        model.addAttribute("tasks", taskService.findAllByDoneOrderByCreatedDesc(false));
         return "tasks/list";
     }
 
     @GetMapping("/done")
     public String getAllDone(Model model) {
-        model.addAttribute("tasks", taskService.findAllByDoneTrueOrderByCreatedDesc());
+        model.addAttribute("tasks", taskService.findAllByDoneOrderByCreatedDesc(true));
         return "tasks/list";
     }
 

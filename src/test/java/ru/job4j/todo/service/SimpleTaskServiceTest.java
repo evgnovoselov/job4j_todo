@@ -45,9 +45,9 @@ class SimpleTaskServiceTest {
                 makeTask(8, true),
                 makeTask(7, true)
         );
-        when(taskRepository.findAllByDoneTrueOrderByCreatedDesc()).thenReturn(tasks);
+        when(taskRepository.findAllByDoneOrderByCreatedDesc(true)).thenReturn(tasks);
 
-        Collection<Task> actualTasks = taskService.findAllByDoneTrueOrderByCreatedDesc();
+        Collection<Task> actualTasks = taskService.findAllByDoneOrderByCreatedDesc(true);
 
         assertThat(actualTasks).usingRecursiveComparison().isEqualTo(tasks);
     }
@@ -59,9 +59,9 @@ class SimpleTaskServiceTest {
                 makeTask(8, false),
                 makeTask(7, false)
         );
-        when(taskRepository.findAllByDoneFalseOrderByCreatedDesc()).thenReturn(tasks);
+        when(taskRepository.findAllByDoneOrderByCreatedDesc(false)).thenReturn(tasks);
 
-        Collection<Task> actualTasks = taskService.findAllByDoneFalseOrderByCreatedDesc();
+        Collection<Task> actualTasks = taskService.findAllByDoneOrderByCreatedDesc(false);
 
         assertThat(actualTasks).usingRecursiveComparison().isEqualTo(tasks);
     }
@@ -155,10 +155,35 @@ class SimpleTaskServiceTest {
 
     @Test
     void whenUpdateTaskThenReturnTrue() {
-        when(taskRepository.update(any(Task.class))).thenReturn(true);
+        Task oldTask = makeTask(7, false);
+        Task task = makeTask(7, false);
+        task.setTitle("Updated task");
+        task.setCreated(oldTask.getCreated().plusHours(3));
+        when(taskRepository.findById(anyInt())).thenReturn(Optional.of(oldTask));
+        ArgumentCaptor<Task> taskArgumentCaptor = ArgumentCaptor.forClass(Task.class);
+        when(taskRepository.update(taskArgumentCaptor.capture())).thenReturn(true);
 
-        boolean hasChange = taskService.update(new Task());
+        boolean hasChange = taskService.update(task);
+        Task actualTask = taskArgumentCaptor.getValue();
 
         assertThat(hasChange).isTrue();
+        Task expectedTask = new Task();
+        expectedTask.setId(task.getId());
+        expectedTask.setTitle(task.getTitle());
+        expectedTask.setDescription(task.getDescription());
+        expectedTask.setDone(task.isDone());
+        expectedTask.setCreated(oldTask.getCreated());
+        assertThat(actualTask).usingRecursiveComparison().isEqualTo(expectedTask);
+    }
+
+    @Test
+    void whenUpdateTaskNotHaveOldThenReturnFalse() {
+        Task task = makeTask(7, false);
+        task.setTitle("Updated task");
+        when(taskRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+        boolean hasChange = taskService.update(task);
+
+        assertThat(hasChange).isFalse();
     }
 }

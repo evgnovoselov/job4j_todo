@@ -50,7 +50,7 @@ class TaskControllerTest {
                 makeTask(2, true),
                 makeTask(3, true)
         );
-        when(taskService.findAllByDoneFalseOrderByCreatedDesc()).thenReturn(tasks);
+        when(taskService.findAllByDoneOrderByCreatedDesc(false)).thenReturn(tasks);
 
         ConcurrentModel model = new ConcurrentModel();
         String view = taskController.getAllNew(model);
@@ -67,7 +67,7 @@ class TaskControllerTest {
                 makeTask(2, true),
                 makeTask(3, true)
         );
-        when(taskService.findAllByDoneTrueOrderByCreatedDesc()).thenReturn(tasks);
+        when(taskService.findAllByDoneOrderByCreatedDesc(true)).thenReturn(tasks);
 
         ConcurrentModel model = new ConcurrentModel();
         String view = taskController.getAllDone(model);
