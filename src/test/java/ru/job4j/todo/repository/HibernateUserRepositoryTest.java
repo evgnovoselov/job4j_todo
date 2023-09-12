@@ -137,4 +137,26 @@ class HibernateUserRepositoryTest {
 
         assertThat(actualUsers).usingRecursiveComparison().isEqualTo(List.of(users.get(0)));
     }
+
+    @Test
+    void whenSaveUserAndFindByLoginAndPasswordThenReturnOptionalUser() {
+        User user = makeUser(7);
+        user.setId(null);
+        userRepository.save(user);
+
+        User actualUser = userRepository.findByLoginAndPassword(user.getLogin(), user.getPassword()).orElseThrow();
+
+        assertThat(actualUser).usingRecursiveComparison().isEqualTo(user);
+    }
+
+    @Test
+    void whenSaveUserAndFindByLoginAndNotCorrectPasswordThenReturnOptionalEmpty() {
+        User user = makeUser(7);
+        user.setId(null);
+        userRepository.save(user);
+
+        Optional<User> actualUser = userRepository.findByLoginAndPassword(user.getLogin(), "notCorrectPassword");
+
+        assertThat(actualUser).isEqualTo(Optional.empty());
+    }
 }

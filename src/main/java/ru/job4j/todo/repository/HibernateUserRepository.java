@@ -36,6 +36,15 @@ public class HibernateUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByLoginAndPassword(String login, String password) {
+        return fromTransaction(session -> session
+                .createQuery("from User where login = :login and password = :password", User.class)
+                .setParameter("login", login)
+                .setParameter("password", password)
+                .uniqueResult());
+    }
+
+    @Override
     public boolean deleteById(int id) {
         return fromTransaction(session -> {
             User user = new User();
