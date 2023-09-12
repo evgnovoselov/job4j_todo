@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru" xmlns:th="https://www.thymeleaf.org">
+<head th:replace="~{fragments/main :: head(~{::title})}">
+    <title>Задачи</title>
+</head>
+<body>
+<th:block th:replace="~{fragments/main :: menu('none')}"></th:block>
+
+<div class="container">
+    <h1>Аутентификация пользователя</h1>
+    <div class="alert alert-danger" role="alert" th:if="${error}" th:text="${error}">
+        Произошла ошибка!
+    </div>
+    <form th:action="@{/users/login}" th:object="${user}" method="post">
+        <div class="mb-3">
+            <label for="inputLogin" class="form-label">Логин</label>
+            <input type="text" class="form-control" id="inputLogin" th:field="*{login}" required>
+        </div>
+        <div class="mb-3">
+            <label for="inputPassword" class="form-label">Пароль</label>
+            <input type="password" class="form-control" id="inputPassword" th:field="*{password}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Войти</button>
+        <a class="btn btn-secondary" role="button" th:href="@{/users/registration}">Зарегистрироваться</a>
+    </form>
+</div>
+
+<th:block th:replace="~{fragments/main :: libsBeforeEndBody}"></th:block>
+</body>
+</html>

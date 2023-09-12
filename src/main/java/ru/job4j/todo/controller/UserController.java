@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.UserService;
 
+import java.util.Optional;
+
 @Controller
 @RequestMapping("/users")
 @AllArgsConstructor
@@ -32,5 +34,28 @@ public class UserController {
         }
         session.setAttribute("user", user);
         return "redirect:/";
+    }
+
+    @GetMapping("/login")
+    public String login(Model model) {
+        model.addAttribute("user", new User());
+        return "users/login";
+    }
+
+    @PostMapping("/login")
+    public String processLogin(User user, Model model, HttpSession session) {
+        Optional<User> userOptional = userService.findByLoginAndPassword(user.getLogin(), user.getPassword());
+        if (userOptional.isEmpty()) {
+            model.addAttribute("error", "Логин или пароль введены неверно.");
+            return "users/login";
+        }
+        session.setAttribute("user", userOptional.get());
+        return "redirect:/";
+    }
+
+    @PostMapping("/logout")
+    public String processLogout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/users/login";
     }
 }
