@@ -18,5 +18,5 @@ public class Task {
     private String title;
     private String description;
     private LocalDateTime created;
-    private Boolean done;
+    private boolean done;
 }

@@ -44,7 +44,6 @@ class HibernateTaskRepositoryTest {
         task.setTitle("title");
         task.setDescription("description");
         task.setCreated(now);
-        task.setDone(false);
 
         boolean isSave = taskRepository.save(task);
         Task actualTask = taskRepository.findById(task.getId()).orElseThrow();
@@ -63,8 +62,7 @@ class HibernateTaskRepositoryTest {
         updateTask.setId(task.getId());
         updateTask.setTitle("update task title");
         updateTask.setDescription("update task description");
-        updateTask.setCreated(task.getCreated().plusHours(1));
-        updateTask.setDone(true);
+        updateTask.setCreated(task.getCreated());
         boolean isUpdate = taskRepository.update(updateTask);
         Task actualTask = taskRepository.findById(updateTask.getId()).orElseThrow();
 
@@ -73,7 +71,7 @@ class HibernateTaskRepositoryTest {
         expectedTask.setId(updateTask.getId());
         expectedTask.setTitle(updateTask.getTitle());
         expectedTask.setDescription(updateTask.getDescription());
-        expectedTask.setDone(updateTask.getDone());
+        expectedTask.setDone(updateTask.isDone());
         expectedTask.setCreated(task.getCreated());
         assertThat(actualTask).usingRecursiveComparison().isEqualTo(expectedTask);
     }
@@ -124,8 +122,8 @@ class HibernateTaskRepositoryTest {
         });
         tasks.forEach(taskRepository::save);
 
-        List<Task> actualTasks = (List<Task>) taskRepository.findAllByDoneTrueOrderByCreatedDesc();
-        List<Task> expectedTasks = tasks.stream().filter(task -> Objects.equals(task.getDone(), true)).toList();
+        List<Task> actualTasks = (List<Task>) taskRepository.findAllByDoneOrderByCreatedDesc(true);
+        List<Task> expectedTasks = tasks.stream().filter(task -> Objects.equals(task.isDone(), true)).toList();
 
         assertThat(actualTasks).usingRecursiveComparison().isEqualTo(expectedTasks);
     }
@@ -146,8 +144,8 @@ class HibernateTaskRepositoryTest {
         });
         tasks.forEach(taskRepository::save);
 
-        List<Task> actualTasks = (List<Task>) taskRepository.findAllByDoneFalseOrderByCreatedDesc();
-        List<Task> expectedTasks = tasks.stream().filter(task -> Objects.equals(task.getDone(), false)).toList();
+        List<Task> actualTasks = (List<Task>) taskRepository.findAllByDoneOrderByCreatedDesc(false);
+        List<Task> expectedTasks = tasks.stream().filter(task -> Objects.equals(task.isDone(), false)).toList();
 
         assertThat(actualTasks).usingRecursiveComparison().isEqualTo(expectedTasks);
     }
@@ -162,7 +160,7 @@ class HibernateTaskRepositoryTest {
         Task actualTask = taskRepository.findById(task.getId()).orElseThrow();
 
         assertThat(hasChange).isTrue();
-        assertThat(actualTask.getDone()).isTrue();
+        assertThat(actualTask.isDone()).isTrue();
     }
 
     @Test

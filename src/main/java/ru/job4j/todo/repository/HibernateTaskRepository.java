@@ -26,19 +26,9 @@ public class HibernateTaskRepository implements TaskRepository {
 
     @Override
     public boolean update(Task task) {
-        String hql = """
-                update Task
-                set title = :title, description = :description, done = :done
-                where id = :id
-                """;
         return fromTransaction(session -> {
-            int changed = session.createMutationQuery(hql)
-                    .setParameter("title", task.getTitle())
-                    .setParameter("description", task.getDescription())
-                    .setParameter("done", task.getDone())
-                    .setParameter("id", task.getId())
-                    .executeUpdate();
-            return changed > 0;
+            session.update(task);
+            return true;
         }).orElse(false);
     }
 
@@ -50,16 +40,10 @@ public class HibernateTaskRepository implements TaskRepository {
     }
 
     @Override
-    public Collection<Task> findAllByDoneTrueOrderByCreatedDesc() {
+    public Collection<Task> findAllByDoneOrderByCreatedDesc(boolean done) {
         return fromTransaction(session -> session
-                .createQuery("from Task where done = true order by created desc", Task.class)
-                .list()).orElse(Collections.emptyList());
-    }
-
-    @Override
-    public Collection<Task> findAllByDoneFalseOrderByCreatedDesc() {
-        return fromTransaction(session -> session
-                .createQuery("from Task where done = false order by created desc", Task.class)
+                .createQuery("from Task where done = :done order by created desc", Task.class)
+                .setParameter("done", done)
                 .list()).orElse(Collections.emptyList());
     }
 

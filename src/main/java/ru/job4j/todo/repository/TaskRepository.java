@@ -12,9 +12,7 @@ public interface TaskRepository {
 
     Collection<Task> findAllByOrderByCreatedDesc();
 
-    Collection<Task> findAllByDoneTrueOrderByCreatedDesc();
-
-    Collection<Task> findAllByDoneFalseOrderByCreatedDesc();
+    Collection<Task> findAllByDoneOrderByCreatedDesc(boolean done);
 
     Optional<Task> findById(int id);
 
