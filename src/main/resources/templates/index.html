@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ru" xmlns:th="https://www.thymeleaf.org">
+<head th:replace="~{fragments/main :: head(~{::title})}">
+    <title>Задачи</title>
+</head>
+<body>
+<th:block th:replace="~{fragments/main :: menu('home')}"></th:block>
+
+<div class="container">
+    <h1>Задачи</h1>
+    <p>Вас приветствует сервис по ведению Задач. Для работы с сервисом нужно зарегистрироваться
+        или авторизоваться.</p>
+    <p>Доступные разделы:</p>
+    <ul>
+        <li th:if="not ${user.id}"><a th:href="@{/users/registration}">Регистрация</a></li>
+        <li th:if="not ${user.id}"><a th:href="@{/users/login}">Вход</a></li>
+        <li th:if="${user.id}"><a th:href="@{/tasks}">Задачи</a></li>
+    </ul>
+</div>
+
+<th:block th:replace="~{fragments/main :: libsBeforeEndBody}"></th:block>
+</body>
+</html>

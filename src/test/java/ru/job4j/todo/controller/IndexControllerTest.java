@@ -16,6 +16,6 @@ class IndexControllerTest {
     void whenGetIndexPageThenRedirectToTasks() {
         String view = indexController.index();
 
-        Assertions.assertThat(view).isEqualTo("redirect:/tasks");
+        Assertions.assertThat(view).isEqualTo("index");
     }
 }
