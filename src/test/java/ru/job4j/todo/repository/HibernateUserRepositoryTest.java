@@ -116,4 +116,25 @@ class HibernateUserRepositoryTest {
         assertThat(isDelete).isFalse();
         assertThat(actualUsers).usingRecursiveComparison().isEqualTo(List.of(user));
     }
+
+    @Test
+    void whenSaveSeveralWithSameLoginThenSaveOnlyFirst() {
+        List<User> users = List.of(
+                makeUser(7),
+                makeUser(8),
+                makeUser(9)
+        );
+        users.forEach(user -> {
+            user.setId(null);
+            user.setLogin("login");
+        });
+
+        assertThat(userRepository.save(users.get(0))).isTrue();
+        assertThat(userRepository.save(users.get(1))).isFalse();
+        assertThat(userRepository.save(users.get(2))).isFalse();
+
+        List<User> actualUsers = (List<User>) userRepository.findAll();
+
+        assertThat(actualUsers).usingRecursiveComparison().isEqualTo(List.of(users.get(0)));
+    }
 }
