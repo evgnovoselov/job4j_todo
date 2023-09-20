@@ -22,7 +22,7 @@ class HibernateUserRepositoryTest {
     @BeforeAll
     static void beforeAll() {
         sessionFactory = new SessionFactoryConfiguration().createSessionFactory();
-        userRepository = new HibernateUserRepository(sessionFactory);
+        userRepository = new HibernateUserRepository(new CrudRepository(sessionFactory));
     }
 
     @AfterEach

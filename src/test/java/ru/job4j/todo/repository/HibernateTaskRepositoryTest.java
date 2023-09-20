@@ -24,7 +24,7 @@ class HibernateTaskRepositoryTest {
     @BeforeAll
     static void beforeAll() {
         sessionFactory = new SessionFactoryConfiguration().createSessionFactory();
-        taskRepository = new HibernateTaskRepository(sessionFactory);
+        taskRepository = new HibernateTaskRepository(new CrudRepository(sessionFactory));
     }
 
     @AfterEach

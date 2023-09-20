@@ -1,72 +1,76 @@
 package ru.job4j.todo.repository;
 
 import lombok.AllArgsConstructor;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.User;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 @Repository
 @AllArgsConstructor
 public class HibernateUserRepository implements UserRepository {
-    private final SessionFactory sf;
+    private final CrudRepository crudRepository;
 
     @Override
     public boolean save(User user) {
-        return fromTransaction(session -> {
-            session.persist(user);
+        try {
+            crudRepository.run(session -> session.persist(user));
             return true;
-        }).orElse(false);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
     public Collection<User> findAll() {
-        return fromTransaction(session -> session.createQuery("from User", User.class)
-                .list()).orElse(Collections.emptyList());
+        try {
+            return crudRepository.query("from User", User.class);
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 
     @Override
     public Optional<User> findById(int id) {
-        return fromTransaction(session -> session.get(User.class, id));
+        try {
+            return crudRepository.optional(
+                    "from User where id = :id",
+                    User.class,
+                    Map.of("id", id)
+            );
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
     @Override
     public Optional<User> findByLoginAndPassword(String login, String password) {
-        return fromTransaction(session -> session
-                .createQuery("from User where login = :login and password = :password", User.class)
-                .setParameter("login", login)
-                .setParameter("password", password)
-                .uniqueResult());
+        try {
+            return crudRepository.optional(
+                    "from User where login = :login and password = :password",
+                    User.class,
+                    Map.of(
+                            "login", login,
+                            "password", password
+                    )
+            );
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
     @Override
     public boolean deleteById(int id) {
-        return fromTransaction(session -> {
-            User user = new User();
-            user.setId(id);
-            session.remove(user);
-            return true;
-        }).orElse(false);
-    }
-
-    private <R> Optional<R> fromTransaction(Function<Session, R> action) {
-        Optional<R> result = Optional.empty();
-        Session session = sf.openSession();
         try {
-            session.beginTransaction();
-            R apply = action.apply(session);
-            session.getTransaction().commit();
-            result = Optional.ofNullable(apply);
+            return crudRepository.run(
+                    "delete from User where id = :id",
+                    Map.of("id", id)
+            );
         } catch (Exception e) {
-            session.getTransaction().rollback();
-        } finally {
-            session.close();
+            return false;
         }
-        return result;
     }
 }

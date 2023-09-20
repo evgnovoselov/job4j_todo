@@ -1,91 +1,98 @@
 package ru.job4j.todo.repository;
 
 import lombok.AllArgsConstructor;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.Task;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 @Repository
 @AllArgsConstructor
 public class HibernateTaskRepository implements TaskRepository {
-    private final SessionFactory sf;
+    private final CrudRepository crudRepository;
 
     @Override
     public boolean save(Task task) {
-        return fromTransaction(session -> {
-            session.persist(task);
+        try {
+            crudRepository.run(session -> session.persist(task));
             return true;
-        }).orElse(false);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
     public boolean update(Task task) {
-        return fromTransaction(session -> {
-            session.update(task);
+        try {
+            crudRepository.run(session -> session.update(task));
             return true;
-        }).orElse(false);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
     public Collection<Task> findAllByOrderByCreatedDesc() {
-        return fromTransaction(session -> session
-                .createQuery("from Task order by created desc", Task.class)
-                .list()).orElse(Collections.emptyList());
+        try {
+            return crudRepository.query("from Task order by created desc", Task.class);
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 
     @Override
     public Collection<Task> findAllByDoneOrderByCreatedDesc(boolean done) {
-        return fromTransaction(session -> session
-                .createQuery("from Task where done = :done order by created desc", Task.class)
-                .setParameter("done", done)
-                .list()).orElse(Collections.emptyList());
+        try {
+            return crudRepository.query(
+                    "from Task where done = :done order by created desc",
+                    Task.class,
+                    Map.of("done", done)
+            );
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 
     @Override
     public Optional<Task> findById(int id) {
-        return fromTransaction(session -> session.get(Task.class, id));
+        try {
+            return crudRepository.optional(
+                    "from Task where id = :id",
+                    Task.class,
+                    Map.of("id", id)
+            );
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
     @Override
     public boolean deleteById(int id) {
-        return fromTransaction(session -> {
-            Task task = new Task();
-            task.setId(id);
-            session.remove(task);
-            return true;
-        }).orElse(false);
+        try {
+            return crudRepository.run(
+                    "delete from Task where id = :id",
+                    Map.of("id", id)
+            );
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
     public boolean setStatusById(int id, boolean done) {
-        return fromTransaction(session -> {
-            int changed = session.createMutationQuery("update Task set done = :done where id = :id")
-                    .setParameter("done", done)
-                    .setParameter("id", id)
-                    .executeUpdate();
-            return changed > 0;
-        }).orElse(false);
-    }
-
-    private <R> Optional<R> fromTransaction(Function<Session, R> action) {
-        Optional<R> result = Optional.empty();
-        Session session = sf.openSession();
         try {
-            session.beginTransaction();
-            Optional<R> apply = Optional.ofNullable(action.apply(session));
-            session.getTransaction().commit();
-            result = apply;
+            return crudRepository.run(
+                    "update Task set done = :done where id = :id",
+                    Map.of(
+                            "done", done,
+                            "id", id
+                    )
+            );
         } catch (Exception e) {
-            session.getTransaction().rollback();
-        } finally {
-            session.close();
+            return false;
         }
-        return result;
     }
 }
