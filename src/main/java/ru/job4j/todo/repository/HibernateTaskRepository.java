@@ -1,6 +1,7 @@
 package ru.job4j.todo.repository;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.Task;
 
@@ -11,6 +12,7 @@ import java.util.Optional;
 
 @Repository
 @AllArgsConstructor
+@Slf4j
 public class HibernateTaskRepository implements TaskRepository {
     private final CrudRepository crudRepository;
 
@@ -20,8 +22,13 @@ public class HibernateTaskRepository implements TaskRepository {
             crudRepository.run(session -> session.persist(task));
             return true;
         } catch (Exception e) {
-            return false;
+            Task errorTask = task;
+            if (errorTask == null) {
+                errorTask = new Task();
+            }
+            log.error("Error save task, title = {}", errorTask.getTitle());
         }
+        return false;
     }
 
     @Override
@@ -30,8 +37,13 @@ public class HibernateTaskRepository implements TaskRepository {
             crudRepository.run(session -> session.update(task));
             return true;
         } catch (Exception e) {
-            return false;
+            Task errorTask = task;
+            if (errorTask == null) {
+                errorTask = new Task();
+            }
+            log.error("Error update task, id = {}", errorTask.getId());
         }
+        return false;
     }
 
     @Override
@@ -39,8 +51,9 @@ public class HibernateTaskRepository implements TaskRepository {
         try {
             return crudRepository.query("from Task order by created desc", Task.class);
         } catch (Exception e) {
-            return Collections.emptyList();
+            log.error("Error find all tasks order by created desc");
         }
+        return Collections.emptyList();
     }
 
     @Override
@@ -52,8 +65,9 @@ public class HibernateTaskRepository implements TaskRepository {
                     Map.of("done", done)
             );
         } catch (Exception e) {
-            return Collections.emptyList();
+            log.error("Error find all tasks by done {} order by created desc", done);
         }
+        return Collections.emptyList();
     }
 
     @Override
@@ -65,8 +79,9 @@ public class HibernateTaskRepository implements TaskRepository {
                     Map.of("id", id)
             );
         } catch (Exception e) {
-            return Optional.empty();
+            log.error("Error find task by id = {}", id);
         }
+        return Optional.empty();
     }
 
     @Override
@@ -77,8 +92,9 @@ public class HibernateTaskRepository implements TaskRepository {
                     Map.of("id", id)
             );
         } catch (Exception e) {
-            return false;
+            log.error("Error delete task by id = {}", id);
         }
+        return false;
     }
 
     @Override
@@ -92,7 +108,8 @@ public class HibernateTaskRepository implements TaskRepository {
                     )
             );
         } catch (Exception e) {
-            return false;
+            log.error("Error set task status done {} by id = {}", done, id);
         }
+        return false;
     }
 }

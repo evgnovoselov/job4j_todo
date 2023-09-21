@@ -1,6 +1,7 @@
 package ru.job4j.todo.repository;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.User;
 
@@ -11,6 +12,7 @@ import java.util.Optional;
 
 @Repository
 @AllArgsConstructor
+@Slf4j
 public class HibernateUserRepository implements UserRepository {
     private final CrudRepository crudRepository;
 
@@ -20,8 +22,13 @@ public class HibernateUserRepository implements UserRepository {
             crudRepository.run(session -> session.persist(user));
             return true;
         } catch (Exception e) {
-            return false;
+            User errorUser = user;
+            if (errorUser == null) {
+                errorUser = new User();
+            }
+            log.error("Error save user, login = {}", errorUser.getLogin());
         }
+        return false;
     }
 
     @Override
@@ -29,8 +36,9 @@ public class HibernateUserRepository implements UserRepository {
         try {
             return crudRepository.query("from User", User.class);
         } catch (Exception e) {
-            return Collections.emptyList();
+            log.error("Error find all users");
         }
+        return Collections.emptyList();
     }
 
     @Override
@@ -42,8 +50,9 @@ public class HibernateUserRepository implements UserRepository {
                     Map.of("id", id)
             );
         } catch (Exception e) {
-            return Optional.empty();
+            log.error("Error find user by id = {}", id);
         }
+        return Optional.empty();
     }
 
     @Override
@@ -58,8 +67,9 @@ public class HibernateUserRepository implements UserRepository {
                     )
             );
         } catch (Exception e) {
-            return Optional.empty();
+            log.error("Error find user by login = {} and password = secret", login);
         }
+        return Optional.empty();
     }
 
     @Override
@@ -70,7 +80,8 @@ public class HibernateUserRepository implements UserRepository {
                     Map.of("id", id)
             );
         } catch (Exception e) {
-            return false;
+            log.error("Error delete user by id = {}", id);
         }
+        return false;
     }
 }
