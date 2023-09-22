@@ -22,11 +22,7 @@ public class HibernateUserRepository implements UserRepository {
             crudRepository.run(session -> session.persist(user));
             return true;
         } catch (Exception e) {
-            User errorUser = user;
-            if (errorUser == null) {
-                errorUser = new User();
-            }
-            log.error("Error save user, login = {}", errorUser.getLogin());
+            log.error("Error save user, login = {}", user.getLogin());
         }
         return false;
     }

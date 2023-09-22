@@ -22,11 +22,7 @@ public class HibernateTaskRepository implements TaskRepository {
             crudRepository.run(session -> session.persist(task));
             return true;
         } catch (Exception e) {
-            Task errorTask = task;
-            if (errorTask == null) {
-                errorTask = new Task();
-            }
-            log.error("Error save task, title = {}", errorTask.getTitle());
+            log.error("Error save task, title = {}", task.getTitle());
         }
         return false;
     }
@@ -37,11 +33,7 @@ public class HibernateTaskRepository implements TaskRepository {
             crudRepository.run(session -> session.update(task));
             return true;
         } catch (Exception e) {
-            Task errorTask = task;
-            if (errorTask == null) {
-                errorTask = new Task();
-            }
-            log.error("Error update task, id = {}", errorTask.getId());
+            log.error("Error update task, id = {}", task.getId());
         }
         return false;
     }
