@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 import static ru.job4j.todo.util.UserUtil.makeUser;
 
 class HibernateUserRepositoryTest {
@@ -67,6 +68,17 @@ class HibernateUserRepositoryTest {
     }
 
     @Test
+    void whenFindByIdAndCrudRepThrowRuntimeExceptionThenReturnEmpty() {
+        CrudRepository crudRepository = mock(CrudRepository.class);
+        HibernateUserRepository userRepositoryMock = new HibernateUserRepository(crudRepository);
+        doThrow(RuntimeException.class).when(crudRepository).optional(any(), any(), any());
+
+        Optional<User> user = userRepositoryMock.findById(1);
+
+        assertThat(user).isEmpty();
+    }
+
+    @Test
     void whenFindAllUserThenReturnCollections() {
         List<User> users = List.of(
                 makeUser(1),
@@ -89,6 +101,17 @@ class HibernateUserRepositoryTest {
         List<User> actualUsers = (List<User>) userRepository.findAll();
 
         assertThat(actualUsers).isEmpty();
+    }
+
+    @Test
+    void whenFindAllAndCrudRepThrowRuntimeExceptionThenReturnEmptyList() {
+        CrudRepository crudRepository = mock(CrudRepository.class);
+        HibernateUserRepository userRepositoryMock = new HibernateUserRepository(crudRepository);
+        doThrow(RuntimeException.class).when(crudRepository).query(any(), any());
+
+        Collection<User> users = userRepositoryMock.findAll();
+
+        assertThat(users).isEmpty();
     }
 
     @Test
@@ -115,6 +138,17 @@ class HibernateUserRepositoryTest {
 
         assertThat(isDelete).isFalse();
         assertThat(actualUsers).usingRecursiveComparison().isEqualTo(List.of(user));
+    }
+
+    @Test
+    void whenDeleteByIdAndCrudRepThrowRuntimeExceptionThenReturnFalse() {
+        CrudRepository crudRepository = mock(CrudRepository.class);
+        HibernateUserRepository userRepositoryMock = new HibernateUserRepository(crudRepository);
+        doThrow(RuntimeException.class).when(crudRepository).run(any(), any());
+
+        boolean hasChange = userRepositoryMock.deleteById(1);
+
+        assertThat(hasChange).isFalse();
     }
 
     @Test
@@ -158,5 +192,16 @@ class HibernateUserRepositoryTest {
         Optional<User> actualUser = userRepository.findByLoginAndPassword(user.getLogin(), "notCorrectPassword");
 
         assertThat(actualUser).isEqualTo(Optional.empty());
+    }
+
+    @Test
+    void whenFindByLoginAndPasswordAndCrudRepThrowRuntimeExceptionThenReturnEmpty() {
+        CrudRepository crudRepository = mock(CrudRepository.class);
+        HibernateUserRepository userRepositoryMock = new HibernateUserRepository(crudRepository);
+        doThrow(RuntimeException.class).when(crudRepository).optional(any(), any(), any());
+
+        Optional<User> user = userRepositoryMock.findByLoginAndPassword("login", "secret");
+
+        assertThat(user).isEmpty();
     }
 }

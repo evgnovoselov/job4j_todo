@@ -10,11 +10,15 @@ import ru.job4j.todo.model.Task;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static ru.job4j.todo.util.TaskUtil.makeTask;
 
 class HibernateTaskRepositoryTest {
@@ -50,6 +54,29 @@ class HibernateTaskRepositoryTest {
 
         assertThat(isSave).isTrue();
         assertThat(actualTask).usingRecursiveComparison().isEqualTo(task);
+    }
+
+    @Test
+    void whenSaveTaskAndCrudRepThrowRuntimeExceptionThenReturnFalse() {
+        CrudRepository crudRepository = mock(CrudRepository.class);
+        HibernateTaskRepository taskRepositoryMock = new HibernateTaskRepository(crudRepository);
+        doThrow(RuntimeException.class).when(crudRepository).run(any());
+
+        Task task = new Task();
+        boolean isSave = taskRepositoryMock.save(task);
+
+        assertThat(isSave).isFalse();
+    }
+
+    @Test
+    void whenFindByIdAndCrudRepThrowRuntimeExceptionThenReturnEmpty() {
+        CrudRepository crudRepository = mock(CrudRepository.class);
+        HibernateTaskRepository taskRepositoryMock = new HibernateTaskRepository(crudRepository);
+        doThrow(RuntimeException.class).when(crudRepository).optional(any(), any(), any());
+
+        Optional<Task> taskOptional = taskRepositoryMock.findById(1);
+
+        assertThat(taskOptional).isEmpty();
     }
 
     @Test
@@ -107,6 +134,17 @@ class HibernateTaskRepositoryTest {
     }
 
     @Test
+    void whenFindAllByOrderByCreatedDescAndCrudRepThrowRuntimeExceptionThenReturnEmptyList() {
+        CrudRepository crudRepository = mock(CrudRepository.class);
+        HibernateTaskRepository taskRepositoryMock = new HibernateTaskRepository(crudRepository);
+        doThrow(RuntimeException.class).when(crudRepository).query(any(), any());
+
+        Collection<Task> tasks = taskRepositoryMock.findAllByOrderByCreatedDesc();
+
+        assertThat(tasks).isEmpty();
+    }
+
+    @Test
     void whenFindAllByDoneTrueOrderByCreatedDescThenReturnTasksDoneAndCreatedDesc() {
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         List<Task> tasks = List.of(
@@ -126,6 +164,17 @@ class HibernateTaskRepositoryTest {
         List<Task> expectedTasks = tasks.stream().filter(task -> Objects.equals(task.isDone(), true)).toList();
 
         assertThat(actualTasks).usingRecursiveComparison().isEqualTo(expectedTasks);
+    }
+
+    @Test
+    void whenFindAllByDoneOrderByCreatedDescAndCrudRepThrowRuntimeExceptionThenReturnEmptyList() {
+        CrudRepository crudRepository = mock(CrudRepository.class);
+        HibernateTaskRepository taskRepositoryMock = new HibernateTaskRepository(crudRepository);
+        doThrow(RuntimeException.class).when(crudRepository).query(any(), any(), any());
+
+        Collection<Task> tasks = taskRepositoryMock.findAllByDoneOrderByCreatedDesc(true);
+
+        assertThat(tasks).isEmpty();
     }
 
     @Test
@@ -171,6 +220,17 @@ class HibernateTaskRepositoryTest {
     }
 
     @Test
+    void whenSetStatusByIdAndCrudRepThrowRuntimeExceptionThenReturnFalse() {
+        CrudRepository crudRepository = mock(CrudRepository.class);
+        HibernateTaskRepository taskRepositoryMock = new HibernateTaskRepository(crudRepository);
+        doThrow(RuntimeException.class).when(crudRepository).run(any(), any());
+
+        boolean hasChange = taskRepositoryMock.setStatusById(1, true);
+
+        assertThat(hasChange).isFalse();
+    }
+
+    @Test
     void whenDeleteByIdCorrectThenReturnTrue() {
         Task task = makeTask(7, false);
         task.setId(null);
@@ -188,5 +248,16 @@ class HibernateTaskRepositoryTest {
         boolean isDelete = taskRepository.deleteById(7);
 
         assertThat(isDelete).isFalse();
+    }
+
+    @Test
+    void whenDeleteByIdAndCrudRepThrowRuntimeExceptionThenReturnFalse() {
+        CrudRepository crudRepository = mock(CrudRepository.class);
+        HibernateTaskRepository taskRepositoryMock = new HibernateTaskRepository(crudRepository);
+        doThrow(RuntimeException.class).when(crudRepository).run(any(), any());
+
+        boolean hasChange = taskRepositoryMock.deleteById(1);
+
+        assertThat(hasChange).isFalse();
     }
 }
