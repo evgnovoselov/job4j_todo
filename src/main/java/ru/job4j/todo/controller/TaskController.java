@@ -1,10 +1,12 @@
 package ru.job4j.todo.controller;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.todo.model.Task;
+import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.TaskService;
 
 import java.util.Optional;
@@ -51,7 +53,9 @@ public class TaskController {
     }
 
     @PostMapping("/create")
-    public String processCreate(Task task, Model model) {
+    public String processCreate(Task task, Model model, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        task.setUser(user);
         boolean isSave = taskService.save(task);
         if (!isSave) {
             model.addAttribute("hasAlert", true);

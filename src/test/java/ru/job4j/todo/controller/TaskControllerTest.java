@@ -2,6 +2,7 @@ package ru.job4j.todo.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.ui.ConcurrentModel;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.service.TaskService;
@@ -120,7 +121,7 @@ class TaskControllerTest {
         task.setId(7);
         when(taskService.save(task)).thenReturn(true);
 
-        String view = taskController.processCreate(task, new ConcurrentModel());
+        String view = taskController.processCreate(task, new ConcurrentModel(), new MockHttpSession());
 
         assertThat(view).isEqualTo("redirect:/tasks/7");
     }
@@ -131,7 +132,7 @@ class TaskControllerTest {
         when(taskService.save(task)).thenReturn(false);
 
         ConcurrentModel model = new ConcurrentModel();
-        String view = taskController.processCreate(task, model);
+        String view = taskController.processCreate(task, model, new MockHttpSession());
         Boolean hasAlert = (Boolean) model.getAttribute("hasAlert");
         Task actualTask = (Task) model.getAttribute("task");
 

@@ -44,6 +44,10 @@
             <td th:text="${task.title}">Значение</td>
         </tr>
         <tr>
+            <th scope="row">Пользователь</th>
+            <td><span th:if="${task.user}" th:text="${task.user.name}">Значение</span></td>
+        </tr>
+        <tr>
             <th scope="row">Создана</th>
             <td th:text="${#temporals.format(task.created,'dd.MM.yyyy HH:mm')}">Значение</td>
         </tr>

@@ -55,6 +55,7 @@ public class SimpleTaskService implements TaskService {
             return false;
         }
         task.setCreated(oldTask.get().getCreated());
+        task.setUser(oldTask.get().getUser());
         return taskRepository.update(task);
     }
 }
