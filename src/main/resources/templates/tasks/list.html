@@ -24,6 +24,7 @@
             <th scope="col">#</th>
             <th scope="col">Статус</th>
             <th scope="col">Название</th>
+            <th scope="col">Приоритет</th>
             <th scope="col">Пользователь</th>
             <th scope="col"><i class="bi bi-arrow-down"></i> Создана</th>
         </tr>
@@ -36,6 +37,7 @@
                 <i th:if="not ${task.done}" class="bi bi-square text-danger"></i>
             </td>
             <td><a th:href="@{/tasks/{taskId}(taskId=${task.id})}" th:text="${task.title}">Задача</a></td>
+            <td th:text="${task.priority.name}">Важно</td>
             <td><span th:if="${task.user}" th:text="${task.user.name}">Пользователь</span></td>
             <td th:text="${#temporals.format(task.created, 'dd.MM.yyyy HH:mm')}">21.08.2023 13:37</td>
         </tr>
