@@ -21,8 +21,8 @@
         <div class="mb-3">
             <label for="selectPriority" class="form-label">Приоритет</label>
             <select class="form-select" id="selectPriority" aria-describedby="priorityHelp"
-                    aria-label="Select priority task" th:field="*{priority}" required>
-                <option th:each="pty : ${priorities}" th:value="${pty.id}" th:text="${pty.name}">Важно
+                    aria-label="Select priority task" th:field="*{priority.id}" required>
+                <option th:each="priority : ${priorities}" th:value="${priority.id}" th:text="${priority.name}">Важно
                 </option>
             </select>
             <div id="priorityHelp" class="form-text">Выберите приоритет задачи</div>
