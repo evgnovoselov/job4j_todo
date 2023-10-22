@@ -96,6 +96,7 @@ public class TaskController {
             return "error/404";
         }
         model.addAttribute("task", taskOptional.get());
+        model.addAttribute("priorities", priorityService.findAllByOrderByPosition());
         return "tasks/update";
     }
 
