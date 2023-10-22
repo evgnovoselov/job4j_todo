@@ -45,7 +45,7 @@
         </tr>
         <tr>
             <th scope="row">Приоритет</th>
-            <td th:text="${task.priority.name}">Значение</td>
+            <td><span th:if="${task.priority}" th:text="${task.priority.name}">Значение</span></td>
         </tr>
         <tr>
             <th scope="row">Пользователь</th>
