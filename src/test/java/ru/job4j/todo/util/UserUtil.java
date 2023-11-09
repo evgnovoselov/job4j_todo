@@ -2,7 +2,7 @@ package ru.job4j.todo.util;
 
 import ru.job4j.todo.model.User;
 
-public class UserUtil {
+public final class UserUtil {
     public static User makeUser(int seed) {
         User user = new User();
         user.setId(seed);
