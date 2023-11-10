@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.ui.ConcurrentModel;
 import ru.job4j.todo.model.Task;
+import ru.job4j.todo.service.PriorityService;
 import ru.job4j.todo.service.TaskService;
 
 import java.util.Collection;
@@ -20,11 +21,13 @@ import static ru.job4j.todo.util.TaskUtil.makeTask;
 class TaskControllerTest {
     private TaskController taskController;
     private TaskService taskService;
+    private PriorityService priorityService;
 
     @BeforeEach
     void setUp() {
         taskService = mock(TaskService.class);
-        taskController = new TaskController(taskService);
+        priorityService = mock(PriorityService.class);
+        taskController = new TaskController(taskService, priorityService);
     }
 
     @Test

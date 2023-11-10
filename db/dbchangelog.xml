@@ -11,4 +11,8 @@
     <include file="scripts/003_ddl_alter_tasks_table_done_not_null.sql" relativeToChangelogFile="true"/>
     <include file="scripts/004_ddl_create_todo_user_table.sql" relativeToChangelogFile="true"/>
     <include file="scripts/005_ddl_alter_tasks_table_add_user_column.sql" relativeToChangelogFile="true"/>
+    <include file="scripts/006_ddl_create_priorities_table.sql" relativeToChangelogFile="true"/>
+    <include file="scripts/007_dml_insert_priorities_data.sql" relativeToChangelogFile="true"/>
+    <include file="scripts/008_ddl_alter_tasks_table_add_priority_column.sql" relativeToChangelogFile="true"/>
+    <include file="scripts/009_dml_update_tasks_table_priority_column.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>

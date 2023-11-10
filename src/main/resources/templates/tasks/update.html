@@ -22,6 +22,15 @@
             <div id="titleHelp" class="form-text">Введите название задачи</div>
         </div>
         <div class="mb-3">
+            <label for="selectPriority" class="form-label">Приоритет</label>
+            <select class="form-select" id="selectPriority" aria-describedby="priorityHelp"
+                    aria-label="Select priority task" th:field="*{priority.id}" required>
+                <option th:each="priority : ${priorities}" th:value="${priority.id}" th:text="${priority.name}">Важно
+                </option>
+            </select>
+            <div id="priorityHelp" class="form-text">Выберите приоритет задачи</div>
+        </div>
+        <div class="mb-3">
             <label for="textareaDescription" class="form-label">Описание</label>
             <textarea class="form-control" id="textareaDescription" rows="3" required
                       aria-describedby="descriptionHelp" th:field="*{description}"></textarea>
