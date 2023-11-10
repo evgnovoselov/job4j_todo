@@ -17,6 +17,17 @@ public class HibernatePriorityRepository implements PriorityRepository {
     private final CrudRepository crudRepository;
 
     @Override
+    public boolean save(Priority priority) {
+        try {
+            crudRepository.run(session -> session.persist(priority));
+            return true;
+        } catch (Exception e) {
+            log.error("Error save priority, name = {}", priority.getName());
+        }
+        return false;
+    }
+
+    @Override
     public Optional<Priority> findById(int id) {
         try {
             return crudRepository.optional(
@@ -38,5 +49,18 @@ public class HibernatePriorityRepository implements PriorityRepository {
             log.error("Error find all priorities tasks by position");
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public boolean deleteById(int id) {
+        try {
+            return crudRepository.run(
+                    "delete from Priority where id = :id",
+                    Map.of("id", id)
+            );
+        } catch (Exception e) {
+            log.error("Error delete priority by id = {}", id);
+        }
+        return false;
     }
 }
