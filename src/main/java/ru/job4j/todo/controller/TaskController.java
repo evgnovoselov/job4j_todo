@@ -63,6 +63,7 @@ public class TaskController {
         if (!isSave) {
             model.addAttribute("hasAlert", true);
             model.addAttribute("task", task);
+            model.addAttribute("priorities", priorityService.findAllByOrderByPosition());
             return "tasks/create";
         }
         return "redirect:/tasks/%s".formatted(task.getId());
@@ -106,6 +107,7 @@ public class TaskController {
         if (!hasChange) {
             model.addAttribute("hasAlert", true);
             model.addAttribute("task", task);
+            model.addAttribute("priorities", priorityService.findAllByOrderByPosition());
             return "tasks/update";
         }
         return "redirect:/tasks/%s".formatted(id);
