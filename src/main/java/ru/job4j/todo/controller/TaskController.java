@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
+import ru.job4j.todo.service.CategoryService;
 import ru.job4j.todo.service.PriorityService;
 import ru.job4j.todo.service.TaskService;
 
@@ -18,6 +19,7 @@ import java.util.Optional;
 public class TaskController {
     private final TaskService taskService;
     private final PriorityService priorityService;
+    private final CategoryService categoryService;
 
     @GetMapping()
     public String getAll(Model model) {
@@ -52,6 +54,7 @@ public class TaskController {
     public String create(Model model) {
         model.addAttribute("task", new Task());
         model.addAttribute("priorities", priorityService.findAllByOrderByPosition());
+        model.addAttribute("categories", categoryService.findAll());
         return "tasks/create";
     }
 
@@ -64,6 +67,7 @@ public class TaskController {
             model.addAttribute("hasAlert", true);
             model.addAttribute("task", task);
             model.addAttribute("priorities", priorityService.findAllByOrderByPosition());
+            model.addAttribute("categories", categoryService.findAll());
             return "tasks/create";
         }
         return "redirect:/tasks/%s".formatted(task.getId());
@@ -98,6 +102,7 @@ public class TaskController {
         }
         model.addAttribute("task", taskOptional.get());
         model.addAttribute("priorities", priorityService.findAllByOrderByPosition());
+        model.addAttribute("categories", categoryService.findAll());
         return "tasks/update";
     }
 
@@ -108,6 +113,7 @@ public class TaskController {
             model.addAttribute("hasAlert", true);
             model.addAttribute("task", task);
             model.addAttribute("priorities", priorityService.findAllByOrderByPosition());
+            model.addAttribute("categories", categoryService.findAll());
             return "tasks/update";
         }
         return "redirect:/tasks/%s".formatted(id);
