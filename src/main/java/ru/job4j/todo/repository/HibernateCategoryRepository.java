@@ -7,6 +7,8 @@ import ru.job4j.todo.model.Category;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
 
 @Repository
 @AllArgsConstructor
@@ -22,5 +24,19 @@ public class HibernateCategoryRepository implements CategoryRepository {
             log.error("Error find all categories");
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public Optional<Category> findById(int id) {
+        try {
+            return crudRepository.optional(
+                    "from Category where id = :id",
+                    Category.class,
+                    Map.of("id", id)
+            );
+        } catch (Exception e) {
+            log.error("Error find category by id = {}", id);
+        }
+        return Optional.empty();
     }
 }
