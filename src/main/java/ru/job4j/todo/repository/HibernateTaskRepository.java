@@ -65,8 +65,14 @@ public class HibernateTaskRepository implements TaskRepository {
     @Override
     public Optional<Task> findById(int id) {
         try {
+            String hql = """
+                    from Task t
+                    left join fetch t.priority
+                    left join fetch t.categories
+                    where t.id = :id
+                    """;
             return crudRepository.optional(
-                    "from Task t left join fetch t.priority where t.id = :id",
+                    hql,
                     Task.class,
                     Map.of("id", id)
             );
