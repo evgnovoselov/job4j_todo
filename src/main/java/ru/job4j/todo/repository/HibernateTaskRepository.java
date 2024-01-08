@@ -41,7 +41,13 @@ public class HibernateTaskRepository implements TaskRepository {
     @Override
     public Collection<Task> findAllByOrderByCreatedDesc() {
         try {
-            return crudRepository.query("from Task t left join fetch t.priority order by t.created desc", Task.class);
+            String hql = """
+                    from Task t
+                    left join fetch t.priority
+                    left join fetch t.categories
+                    order by t.created desc
+                    """;
+            return crudRepository.query(hql, Task.class);
         } catch (Exception e) {
             log.error("Error find all tasks order by created desc");
         }
@@ -51,8 +57,15 @@ public class HibernateTaskRepository implements TaskRepository {
     @Override
     public Collection<Task> findAllByDoneOrderByCreatedDesc(boolean done) {
         try {
+            String hql = """
+                    from Task t
+                    left join fetch t.priority
+                    left join fetch t.categories
+                    where t.done = :done
+                    order by t.created desc
+                    """;
             return crudRepository.query(
-                    "from Task t left join fetch t.priority where t.done = :done order by t.created desc",
+                    hql,
                     Task.class,
                     Map.of("done", done)
             );
