@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.todo.dto.TaskCreateDto;
+import ru.job4j.todo.dto.TaskUpdateDto;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.CategoryService;
@@ -95,7 +96,7 @@ public class TaskController {
 
     @GetMapping("/{id}/update")
     public String updateById(@PathVariable int id, Model model) {
-        Optional<Task> taskOptional = taskService.findById(id);
+        Optional<TaskUpdateDto> taskOptional = taskService.getTaskUpdateDtoById(id);
         if (taskOptional.isEmpty()) {
             model.addAttribute("message", "Задача не найдена.");
             return "error/404";
@@ -107,7 +108,7 @@ public class TaskController {
     }
 
     @PostMapping("/{id}/update")
-    public String processUpdate(Task task, @PathVariable int id, Model model) {
+    public String processUpdate(TaskUpdateDto task, @PathVariable int id, Model model) {
         boolean hasChange = taskService.update(task);
         if (!hasChange) {
             model.addAttribute("hasAlert", true);

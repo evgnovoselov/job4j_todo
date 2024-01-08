@@ -3,6 +3,7 @@ package ru.job4j.todo.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.job4j.todo.dto.TaskCreateDto;
+import ru.job4j.todo.dto.TaskUpdateDto;
 import ru.job4j.todo.mapper.TaskMapper;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
@@ -39,6 +40,15 @@ public class SimpleTaskService implements TaskService {
     }
 
     @Override
+    public Optional<TaskUpdateDto> getTaskUpdateDtoById(int id) {
+        Optional<Task> taskOptional = taskRepository.findById(id);
+        if (taskOptional.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(taskMapper.toTaskUpdateDto(taskOptional.get()));
+    }
+
+    @Override
     public Optional<Integer> save(TaskCreateDto taskCreateDto, User user) {
         Task task = taskMapper.toTask(taskCreateDto);
         if (task.getTitle() == null || task.getTitle().isBlank()) {
@@ -60,7 +70,8 @@ public class SimpleTaskService implements TaskService {
     }
 
     @Override
-    public boolean update(Task task) {
+    public boolean update(TaskUpdateDto taskUpdateDto) {
+        Task task = taskMapper.toTask(taskUpdateDto);
         Optional<Task> oldTask = taskRepository.findById(task.getId());
         if (oldTask.isEmpty()) {
             return false;

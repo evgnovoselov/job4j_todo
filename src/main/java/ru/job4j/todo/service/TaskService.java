@@ -1,6 +1,7 @@
 package ru.job4j.todo.service;
 
 import ru.job4j.todo.dto.TaskCreateDto;
+import ru.job4j.todo.dto.TaskUpdateDto;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
 
@@ -16,11 +17,13 @@ public interface TaskService {
 
     Optional<Task> findById(int id);
 
+    Optional<TaskUpdateDto> getTaskUpdateDtoById(int id);
+
     Optional<Integer> save(TaskCreateDto taskCreateDto, User user);
 
     boolean setStatusById(int id, boolean done);
 
     boolean deleteById(int id);
 
-    boolean update(Task task);
+    boolean update(TaskUpdateDto taskUpdateDto);
 }
