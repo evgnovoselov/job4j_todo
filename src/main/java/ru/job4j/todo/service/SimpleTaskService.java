@@ -2,7 +2,10 @@ package ru.job4j.todo.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.job4j.todo.dto.TaskCreateDto;
+import ru.job4j.todo.mapper.TaskMapper;
 import ru.job4j.todo.model.Task;
+import ru.job4j.todo.model.User;
 import ru.job4j.todo.repository.TaskRepository;
 
 import java.time.LocalDateTime;
@@ -13,6 +16,12 @@ import java.util.Optional;
 @AllArgsConstructor
 public class SimpleTaskService implements TaskService {
     private final TaskRepository taskRepository;
+    private final TaskMapper taskMapper;
+
+    @Override
+    public TaskCreateDto getEmptyTaskCreateDto() {
+        return taskMapper.toTaskCreateDto(new Task());
+    }
 
     @Override
     public Collection<Task> findAllByOrderByCreatedDesc() {
@@ -30,11 +39,13 @@ public class SimpleTaskService implements TaskService {
     }
 
     @Override
-    public boolean save(Task task) {
+    public Optional<Integer> save(TaskCreateDto taskCreateDto, User user) {
+        Task task = taskMapper.toTask(taskCreateDto);
         if (task.getTitle() == null || task.getTitle().isBlank()) {
             task.setTitle("Задача без названия");
         }
         task.setCreated(LocalDateTime.now());
+        task.setUser(user);
         return taskRepository.save(task);
     }
 

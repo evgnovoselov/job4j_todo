@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.job4j.todo.dto.TaskCreateDto;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.CategoryService;
@@ -52,25 +53,24 @@ public class TaskController {
 
     @GetMapping("/create")
     public String create(Model model) {
-        model.addAttribute("task", new Task());
+        model.addAttribute("task", taskService.getEmptyTaskCreateDto());
         model.addAttribute("priorities", priorityService.findAllByOrderByPosition());
         model.addAttribute("categories", categoryService.findAll());
         return "tasks/create";
     }
 
     @PostMapping("/create")
-    public String processCreate(Task task, Model model, HttpSession session) {
+    public String processCreate(TaskCreateDto task, Model model, HttpSession session) {
         User user = (User) session.getAttribute("user");
-        task.setUser(user);
-        boolean isSave = taskService.save(task);
-        if (!isSave) {
+        Optional<Integer> savedId = taskService.save(task, user);
+        if (savedId.isEmpty()) {
             model.addAttribute("hasAlert", true);
             model.addAttribute("task", task);
             model.addAttribute("priorities", priorityService.findAllByOrderByPosition());
             model.addAttribute("categories", categoryService.findAll());
             return "tasks/create";
         }
-        return "redirect:/tasks/%s".formatted(task.getId());
+        return "redirect:/tasks/%s".formatted(savedId.get());
     }
 
     @PostMapping("/{id}/set-status")

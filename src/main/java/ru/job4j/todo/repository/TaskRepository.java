@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface TaskRepository {
-    boolean save(Task task);
+    Optional<Integer> save(Task task);
 
     boolean update(Task task);
 

@@ -1,18 +1,22 @@
 package ru.job4j.todo.service;
 
+import ru.job4j.todo.dto.TaskCreateDto;
 import ru.job4j.todo.model.Task;
+import ru.job4j.todo.model.User;
 
 import java.util.Collection;
 import java.util.Optional;
 
 public interface TaskService {
+    TaskCreateDto getEmptyTaskCreateDto();
+
     Collection<Task> findAllByOrderByCreatedDesc();
 
     Collection<Task> findAllByDoneOrderByCreatedDesc(boolean done);
 
     Optional<Task> findById(int id);
 
-    boolean save(Task task);
+    Optional<Integer> save(TaskCreateDto taskCreateDto, User user);
 
     boolean setStatusById(int id, boolean done);
 

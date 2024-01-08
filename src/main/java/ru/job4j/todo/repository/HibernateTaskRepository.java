@@ -17,14 +17,14 @@ public class HibernateTaskRepository implements TaskRepository {
     private final CrudRepository crudRepository;
 
     @Override
-    public boolean save(Task task) {
+    public Optional<Integer> save(Task task) {
         try {
             crudRepository.run(session -> session.persist(task));
-            return true;
+            return Optional.ofNullable(task.getId());
         } catch (Exception e) {
             log.error("Error save task, title = {}", task.getTitle());
         }
-        return false;
+        return Optional.empty();
     }
 
     @Override
