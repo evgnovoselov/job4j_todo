@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface TaskMapper {
+    @Mapping(target = "categoryIds", ignore = true)
+    @Mapping(target = "priorityId", ignore = true)
     TaskCreateDto toTaskCreateDto(Task task);
 
     @Mapping(target = "priorityId", source = "priority.id")
@@ -26,8 +28,12 @@ public interface TaskMapper {
     }
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "created", ignore = true)
+    @Mapping(target = "done", ignore = true)
+    @Mapping(target = "user", ignore = true)
     Task toTask(TaskCreateDto taskCreateDto, Set<Category> categories, Priority priority);
 
     @Mapping(target = "id", source = "taskUpdateDto.id")
+    @Mapping(target = "user", ignore = true)
     Task toTask(TaskUpdateDto taskUpdateDto, Set<Category> categories, Priority priority);
 }
