@@ -1,70 +1,33 @@
 package ru.job4j.todo.mapper;
 
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.job4j.todo.dto.TaskCreateDto;
 import ru.job4j.todo.dto.TaskUpdateDto;
 import ru.job4j.todo.model.Category;
+import ru.job4j.todo.model.Priority;
 import ru.job4j.todo.model.Task;
-import ru.job4j.todo.service.CategoryService;
-import ru.job4j.todo.service.PriorityService;
 
+import java.util.Set;
 import java.util.stream.Collectors;
 
-@Component
-@AllArgsConstructor
-public class TaskMapper {
-    private final CategoryService categoryService;
-    private final PriorityService priorityService;
+@Mapper(componentModel = "spring")
+public interface TaskMapper {
+    TaskCreateDto toTaskCreateDto(Task task);
 
-    public TaskCreateDto toTaskCreateDto(Task task) {
-        Integer priorityId = null;
-        if (task.getPriority() != null) {
-            priorityId = task.getPriority().getId();
-        }
-        return new TaskCreateDto(
-                task.getTitle(),
-                task.getCategories().stream().map(Category::getId).collect(Collectors.toSet()),
-                priorityId,
-                task.getDescription()
-        );
+    @Mapping(target = "priorityId", source = "priority.id")
+    @Mapping(target = "categoryIds", source = "categories")
+    TaskUpdateDto toTaskUpdateDto(Task task);
+
+    default Set<Integer> toCategoryIds(Set<Category> categories) {
+        return categories.stream()
+                .map(Category::getId)
+                .collect(Collectors.toSet());
     }
 
-    public Task toTask(TaskCreateDto taskCreateDto) {
-        Task task = new Task();
-        task.setTitle(taskCreateDto.title());
-        task.setDescription(taskCreateDto.description());
-        taskCreateDto
-                .categoryIds().forEach(categoryId -> categoryService.findById(categoryId)
-                        .ifPresent(category -> task.getCategories().add(category)));
-        priorityService.findById(taskCreateDto.priorityId()).ifPresent(task::setPriority);
-        return task;
-    }
+    @Mapping(target = "id", ignore = true)
+    Task toTask(TaskCreateDto taskCreateDto, Set<Category> categories, Priority priority);
 
-    public TaskUpdateDto toTaskUpdateDto(Task task) {
-        return new TaskUpdateDto(
-                task.getId(),
-                task.getTitle(),
-                task.getDescription(),
-                task.getCategories().stream().map(Category::getId).collect(Collectors.toSet()),
-                task.getPriority().getId(),
-                task.isDone(),
-                task.getCreated()
-        );
-    }
-
-    public Task toTask(TaskUpdateDto taskUpdateDto) {
-        Task task = new Task();
-        task.setId(taskUpdateDto.id());
-        task.setTitle(taskUpdateDto.title());
-        task.setDescription(taskUpdateDto.description());
-        taskUpdateDto
-                .categoryIds().forEach(categoryId -> categoryService.findById(categoryId)
-                        .ifPresent(category -> task.getCategories().add(category)));
-        priorityService.findById(taskUpdateDto.priorityId())
-                .ifPresent(task::setPriority);
-        task.setDone(taskUpdateDto.done());
-        task.setCreated(taskUpdateDto.created());
-        return task;
-    }
+    @Mapping(target = "id", source = "taskUpdateDto.id")
+    Task toTask(TaskUpdateDto taskUpdateDto, Set<Category> categories, Priority priority);
 }
