@@ -1,18 +1,26 @@
 package ru.job4j.todo.controller;
 
+import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.ui.ConcurrentModel;
+import ru.job4j.todo.dto.TaskCreateDto;
+import ru.job4j.todo.dto.TaskUpdateDto;
+import ru.job4j.todo.model.Category;
+import ru.job4j.todo.model.Priority;
 import ru.job4j.todo.model.Task;
+import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.CategoryService;
 import ru.job4j.todo.service.PriorityService;
 import ru.job4j.todo.service.TaskService;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -20,8 +28,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static ru.job4j.todo.util.TaskUtil.makeTask;
 
-// TODO fix
-@Disabled("Need fix")
 class TaskControllerTest {
     private TaskController taskController;
     private TaskService taskService;
@@ -113,45 +119,61 @@ class TaskControllerTest {
     }
 
     @Test
-    void whenGetCreatePageThenReturnViewWithEmptyTask() {
-        Task task = new Task();
-
+    void whenGetCreatePageThenReturnViewWithEmptyTaskCreateDto() {
         ConcurrentModel model = new ConcurrentModel();
+        Mockito.when(taskService.getEmptyTaskCreateDto())
+                .thenReturn(new TaskCreateDto(null, null, null, null));
+
         String view = taskController.create(model);
-        Task actualTask = (Task) model.getAttribute("task");
+        TaskCreateDto actualTask = (TaskCreateDto) model.getAttribute("task");
 
         assertThat(view).isEqualTo("tasks/create");
-        assertThat(actualTask).isEqualTo(task);
+        assertThat(actualTask).isEqualTo(new TaskCreateDto(
+                null,
+                null,
+                null,
+                null
+        ));
     }
 
-    // TODO fix
-    @Disabled
     @Test
     void whenProcessCreatingTaskCorrectThenReturnRedirectTaskPage() {
-//        Task task = new Task();
-//        task.setId(7);
-//        when(taskService.save(task)).thenReturn(true);
-//
-//        String view = taskController.processCreate(task, new ConcurrentModel(), new MockHttpSession());
-//
-//        assertThat(view).isEqualTo("redirect:/tasks/7");
+        TaskCreateDto taskCreateDto = new TaskCreateDto("Title", Set.of(1, 2), 1, "Description");
+        User user = new User();
+        HttpSession session = mock(HttpSession.class);
+        when(session.getAttribute("user")).thenReturn(user);
+        when(taskService.save(taskCreateDto, user)).thenReturn(Optional.of(7));
+
+        String view = taskController.processCreate(taskCreateDto, new ConcurrentModel(), session);
+
+        assertThat(view).isEqualTo("redirect:/tasks/7");
     }
 
-    // TODO fix
-    @Disabled
     @Test
+    @SuppressWarnings(value = "unchecked")
     void whenProcessCreatingTaskWrongThenReturnCreatePageWIthTaskAndAlert() {
-//        Task task = makeTask(1, true);
-//        when(taskService.save(task)).thenReturn(false);
-//
-//        ConcurrentModel model = new ConcurrentModel();
-//        String view = taskController.processCreate(task, model, new MockHttpSession());
-//        Boolean hasAlert = (Boolean) model.getAttribute("hasAlert");
-//        Task actualTask = (Task) model.getAttribute("task");
-//
-//        assertThat(view).isEqualTo("tasks/create");
-//        assertThat(hasAlert).isTrue();
-//        assertThat(actualTask).usingRecursiveComparison().isEqualTo(task);
+        HttpSession session = mock(HttpSession.class);
+        TaskCreateDto taskCreateDto = new TaskCreateDto("Title", Set.of(1, 2), 1, "Description");
+        User user = new User();
+        when(session.getAttribute("user")).thenReturn(user);
+        when(taskService.save(taskCreateDto, user)).thenReturn(Optional.empty());
+        Set<Priority> priorities = Set.of(new Priority());
+        when(priorityService.findAllByOrderByPosition()).thenReturn(priorities);
+        Set<Category> categories = Set.of(new Category());
+        when(categoryService.findAll()).thenReturn(categories);
+
+        ConcurrentModel model = new ConcurrentModel();
+        String view = taskController.processCreate(taskCreateDto, model, new MockHttpSession());
+        Boolean hasAlert = (Boolean) model.getAttribute("hasAlert");
+        TaskCreateDto actualTask = (TaskCreateDto) model.getAttribute("task");
+        Set<Priority> actualPriorities = (Set<Priority>) model.getAttribute("priorities");
+        Set<Category> actualCategories = (Set<Category>) model.getAttribute("categories");
+
+        assertThat(view).isEqualTo("tasks/create");
+        assertThat(hasAlert).isTrue();
+        assertThat(actualTask).usingRecursiveComparison().isEqualTo(taskCreateDto);
+        assertThat(actualPriorities).isEqualTo(priorities);
+        assertThat(actualCategories).isEqualTo(categories);
     }
 
     @Test
@@ -203,16 +225,28 @@ class TaskControllerTest {
     }
 
     @Test
+    @SuppressWarnings(value = "unchecked")
     void whenGetPageUpdateByIdThenGetPageWithTask() {
-        Task task = makeTask(7, false);
-        when(taskService.findById(task.getId())).thenReturn(Optional.of(task));
+        TaskUpdateDto taskUpdateDto = new TaskUpdateDto(
+                1, "Title", "description",
+                Set.of(1), 1, false, LocalDateTime.now()
+        );
+        Set<Priority> priorities = Set.of(new Priority());
+        Set<Category> categories = Set.of(new Category());
+        when(taskService.getTaskUpdateDtoById(taskUpdateDto.id())).thenReturn(Optional.of(taskUpdateDto));
+        when(priorityService.findAllByOrderByPosition()).thenReturn(priorities);
+        when(categoryService.findAll()).thenReturn(categories);
 
         ConcurrentModel model = new ConcurrentModel();
-        String view = taskController.updateById(task.getId(), model);
-        Task actualTask = (Task) model.getAttribute("task");
+        String view = taskController.updateById(taskUpdateDto.id(), model);
+        TaskUpdateDto actualTask = (TaskUpdateDto) model.getAttribute("task");
+        Set<Priority> actualPriorities = (Set<Priority>) model.getAttribute("priorities");
+        Set<Category> actualCategories = (Set<Category>) model.getAttribute("categories");
 
         assertThat(view).isEqualTo("tasks/update");
-        assertThat(actualTask).usingRecursiveComparison().isEqualTo(task);
+        assertThat(actualTask).usingRecursiveComparison().isEqualTo(taskUpdateDto);
+        assertThat(actualPriorities).isEqualTo(priorities);
+        assertThat(actualCategories).isEqualTo(categories);
     }
 
     @Test
@@ -227,33 +261,44 @@ class TaskControllerTest {
         assertThat(message).isEqualTo("Задача не найдена.");
     }
 
-    // TODO fix
-    @Disabled
     @Test
     void whenProcessUpdateCorrectThenRedirectPageTask() {
-//        Task task = makeTask(7, false);
-//        when(taskService.update(task)).thenReturn(true);
-//
-//        ConcurrentModel model = new ConcurrentModel();
-//        String view = taskController.processUpdate(task, 7, model);
-//
-//        assertThat(view).isEqualTo("redirect:/tasks/7");
+        TaskUpdateDto taskUpdateDto = new TaskUpdateDto(
+                1, "Title", "description",
+                Set.of(1), 1, false, LocalDateTime.now()
+        );
+        when(taskService.update(taskUpdateDto)).thenReturn(true);
+
+        ConcurrentModel model = new ConcurrentModel();
+        String view = taskController.processUpdate(taskUpdateDto, 7, model);
+
+        assertThat(view).isEqualTo("redirect:/tasks/7");
     }
 
-    // TODO fix
-    @Disabled
     @Test
+    @SuppressWarnings(value = "unchecked")
     void whenProcessUpdateNotCorrectThenGetPageUpdateWithAlertAndTask() {
-//        Task task = makeTask(7, false);
-//        when(taskService.update(task)).thenReturn(false);
-//
-//        ConcurrentModel model = new ConcurrentModel();
-//        String view = taskController.processUpdate(task, 7, model);
-//        Boolean hasAlert = (Boolean) model.getAttribute("hasAlert");
-//        Task actualTask = (Task) model.getAttribute("task");
-//
-//        assertThat(view).isEqualTo("tasks/update");
-//        assertThat(hasAlert).isTrue();
-//        assertThat(actualTask).usingRecursiveComparison().isEqualTo(task);
+        TaskUpdateDto taskUpdateDto = new TaskUpdateDto(
+                1, "Title", "description",
+                Set.of(1), 1, false, LocalDateTime.now()
+        );
+        Set<Priority> priorities = Set.of(new Priority());
+        Set<Category> categories = Set.of(new Category());
+        when(taskService.update(taskUpdateDto)).thenReturn(false);
+        when(priorityService.findAllByOrderByPosition()).thenReturn(priorities);
+        when(categoryService.findAll()).thenReturn(categories);
+
+        ConcurrentModel model = new ConcurrentModel();
+        String view = taskController.processUpdate(taskUpdateDto, 7, model);
+        Boolean hasAlert = (Boolean) model.getAttribute("hasAlert");
+        TaskUpdateDto actualTask = (TaskUpdateDto) model.getAttribute("task");
+        Set<Priority> actualPriorities = (Set<Priority>) model.getAttribute("priorities");
+        Set<Category> actualCategories = (Set<Category>) model.getAttribute("categories");
+
+        assertThat(view).isEqualTo("tasks/update");
+        assertThat(hasAlert).isTrue();
+        assertThat(actualTask).usingRecursiveComparison().isEqualTo(taskUpdateDto);
+        assertThat(actualPriorities).isEqualTo(priorities);
+        assertThat(actualCategories).isEqualTo(categories);
     }
 }
