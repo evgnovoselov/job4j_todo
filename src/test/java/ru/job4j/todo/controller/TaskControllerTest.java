@@ -225,7 +225,7 @@ class TaskControllerTest {
     }
 
     @Test
-    @SuppressWarnings(value = "unchecked")
+    @SuppressWarnings("unchecked")
     void whenGetPageUpdateByIdThenGetPageWithTask() {
         TaskUpdateDto taskUpdateDto = new TaskUpdateDto(
                 1, "Title", "description",
@@ -276,7 +276,7 @@ class TaskControllerTest {
     }
 
     @Test
-    @SuppressWarnings(value = "unchecked")
+    @SuppressWarnings("unchecked")
     void whenProcessUpdateNotCorrectThenGetPageUpdateWithAlertAndTask() {
         TaskUpdateDto taskUpdateDto = new TaskUpdateDto(
                 1, "Title", "description",
