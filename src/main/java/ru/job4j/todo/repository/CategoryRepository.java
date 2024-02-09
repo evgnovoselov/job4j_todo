@@ -6,9 +6,11 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface CategoryRepository {
-    Collection<Category> findAll();
+    boolean save(Category category);
 
     Optional<Category> findById(int id);
+
+    Collection<Category> findAll();
 
     boolean deleteById(int id);
 }

@@ -27,6 +27,17 @@ public class HibernateCategoryRepository implements CategoryRepository {
     }
 
     @Override
+    public boolean save(Category category) {
+        try {
+            crudRepository.run(session -> session.persist(category));
+            return true;
+        } catch (Exception e) {
+            log.error("Error save category, name = {}", category.getName());
+        }
+        return false;
+    }
+
+    @Override
     public Optional<Category> findById(int id) {
         try {
             return crudRepository.optional(
