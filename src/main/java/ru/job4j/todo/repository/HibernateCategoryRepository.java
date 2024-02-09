@@ -39,4 +39,17 @@ public class HibernateCategoryRepository implements CategoryRepository {
         }
         return Optional.empty();
     }
+
+    @Override
+    public boolean deleteById(int id) {
+        try {
+            return crudRepository.run(
+                    "delete from Category where id = :id",
+                    Map.of("id", id)
+            );
+        } catch (Exception e) {
+            log.error("Error delete category by id = {}", id);
+        }
+        return false;
+    }
 }

@@ -9,4 +9,6 @@ public interface CategoryRepository {
     Collection<Category> findAll();
 
     Optional<Category> findById(int id);
+
+    boolean deleteById(int id);
 }
