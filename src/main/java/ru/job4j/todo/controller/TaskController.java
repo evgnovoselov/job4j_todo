@@ -5,8 +5,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.job4j.todo.dto.TaskCreateDto;
+import ru.job4j.todo.dto.TaskUpdateDto;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
+import ru.job4j.todo.service.CategoryService;
 import ru.job4j.todo.service.PriorityService;
 import ru.job4j.todo.service.TaskService;
 
@@ -18,6 +21,7 @@ import java.util.Optional;
 public class TaskController {
     private final TaskService taskService;
     private final PriorityService priorityService;
+    private final CategoryService categoryService;
 
     @GetMapping()
     public String getAll(Model model) {
@@ -50,23 +54,24 @@ public class TaskController {
 
     @GetMapping("/create")
     public String create(Model model) {
-        model.addAttribute("task", new Task());
+        model.addAttribute("task", taskService.getEmptyTaskCreateDto());
         model.addAttribute("priorities", priorityService.findAllByOrderByPosition());
+        model.addAttribute("categories", categoryService.findAll());
         return "tasks/create";
     }
 
     @PostMapping("/create")
-    public String processCreate(Task task, Model model, HttpSession session) {
+    public String processCreate(TaskCreateDto task, Model model, HttpSession session) {
         User user = (User) session.getAttribute("user");
-        task.setUser(user);
-        boolean isSave = taskService.save(task);
-        if (!isSave) {
+        Optional<Integer> savedId = taskService.save(task, user);
+        if (savedId.isEmpty()) {
             model.addAttribute("hasAlert", true);
             model.addAttribute("task", task);
             model.addAttribute("priorities", priorityService.findAllByOrderByPosition());
+            model.addAttribute("categories", categoryService.findAll());
             return "tasks/create";
         }
-        return "redirect:/tasks/%s".formatted(task.getId());
+        return "redirect:/tasks/%s".formatted(savedId.get());
     }
 
     @PostMapping("/{id}/set-status")
@@ -91,23 +96,25 @@ public class TaskController {
 
     @GetMapping("/{id}/update")
     public String updateById(@PathVariable int id, Model model) {
-        Optional<Task> taskOptional = taskService.findById(id);
+        Optional<TaskUpdateDto> taskOptional = taskService.getTaskUpdateDtoById(id);
         if (taskOptional.isEmpty()) {
             model.addAttribute("message", "Задача не найдена.");
             return "error/404";
         }
         model.addAttribute("task", taskOptional.get());
         model.addAttribute("priorities", priorityService.findAllByOrderByPosition());
+        model.addAttribute("categories", categoryService.findAll());
         return "tasks/update";
     }
 
     @PostMapping("/{id}/update")
-    public String processUpdate(Task task, @PathVariable int id, Model model) {
+    public String processUpdate(TaskUpdateDto task, @PathVariable int id, Model model) {
         boolean hasChange = taskService.update(task);
         if (!hasChange) {
             model.addAttribute("hasAlert", true);
             model.addAttribute("task", task);
             model.addAttribute("priorities", priorityService.findAllByOrderByPosition());
+            model.addAttribute("categories", categoryService.findAll());
             return "tasks/update";
         }
         return "redirect:/tasks/%s".formatted(id);

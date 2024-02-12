@@ -19,9 +19,19 @@
             <div id="titleHelp" class="form-text">Введите название задачи</div>
         </div>
         <div class="mb-3">
+            <label for="selectCategory">Категории</label>
+            <select class="form-select" id="selectCategory" size="3" multiple required th:field="*{categoryIds}"
+                    aria-label="Select categories task" aria-describedby="categoryHelp">
+                <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}">
+                    Категория
+                </option>
+            </select>
+            <div id="categoryHelp" class="form-text">Выберите категории задачи</div>
+        </div>
+        <div class="mb-3">
             <label for="selectPriority" class="form-label">Приоритет</label>
             <select class="form-select" id="selectPriority" aria-describedby="priorityHelp"
-                    aria-label="Select priority task" th:field="*{priority.id}" required>
+                    aria-label="Select priority task" th:field="*{priorityId}" required>
                 <option th:each="priority : ${priorities}" th:value="${priority.id}" th:text="${priority.name}">Важно
                 </option>
             </select>

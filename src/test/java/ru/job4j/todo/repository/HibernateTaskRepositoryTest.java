@@ -1,19 +1,13 @@
 package ru.job4j.todo.repository;
 
 import org.hibernate.SessionFactory;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import ru.job4j.todo.configuration.SessionFactoryConfiguration;
 import ru.job4j.todo.model.Task;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,17 +36,17 @@ class HibernateTaskRepositoryTest {
     }
 
     @Test
-    void whenSaveTaskThenReturnTrueAndSetIdInTask() {
+    void whenSaveTaskThenReturnIdAndSetIdInTask() {
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         Task task = new Task();
         task.setTitle("title");
         task.setDescription("description");
         task.setCreated(now);
 
-        boolean isSave = taskRepository.save(task);
+        Optional<Integer> savedId = taskRepository.save(task);
         Task actualTask = taskRepository.findById(task.getId()).orElseThrow();
 
-        assertThat(isSave).isTrue();
+        assertThat(savedId.isPresent()).isTrue();
         assertThat(actualTask).usingRecursiveComparison().isEqualTo(task);
     }
 
@@ -63,9 +57,9 @@ class HibernateTaskRepositoryTest {
         doThrow(RuntimeException.class).when(crudRepository).run(any());
 
         Task task = new Task();
-        boolean isSave = taskRepositoryMock.save(task);
+        Optional<Integer> savedId = taskRepositoryMock.save(task);
 
-        assertThat(isSave).isFalse();
+        assertThat(savedId.isPresent()).isFalse();
     }
 
     @Test
@@ -83,6 +77,8 @@ class HibernateTaskRepositoryTest {
     void whenUpdateTaskCorrectThenReturnTrueAndTaskUpdated() {
         Task task = makeTask(7, false);
         task.setId(null);
+        task.setPriority(null);
+        task.setCategories(null);
         taskRepository.save(task);
 
         Task updateTask = new Task();
@@ -124,6 +120,8 @@ class HibernateTaskRepositoryTest {
         );
         tasks.forEach(task -> {
             task.setCreated(now.plusHours(task.getId()));
+            task.setPriority(null);
+            task.setCategories(Set.of());
             task.setId(null);
         });
         tasks.forEach(taskRepository::save);
@@ -156,6 +154,8 @@ class HibernateTaskRepositoryTest {
         );
         tasks.forEach(task -> {
             task.setCreated(now.plusHours(task.getId()));
+            task.setPriority(null);
+            task.setCategories(Set.of());
             task.setId(null);
         });
         tasks.forEach(taskRepository::save);
@@ -189,6 +189,8 @@ class HibernateTaskRepositoryTest {
         );
         tasks.forEach(task -> {
             task.setCreated(now.plusHours(task.getId()));
+            task.setPriority(null);
+            task.setCategories(Set.of());
             task.setId(null);
         });
         tasks.forEach(taskRepository::save);
@@ -203,6 +205,8 @@ class HibernateTaskRepositoryTest {
     void whenSetStatusByIdCorrectThenReturnTrueAndChangeStatus() {
         Task task = makeTask(7, false);
         task.setId(null);
+        task.setPriority(null);
+        task.setCategories(Set.of());
         taskRepository.save(task);
 
         boolean hasChange = taskRepository.setStatusById(task.getId(), true);
@@ -234,6 +238,8 @@ class HibernateTaskRepositoryTest {
     void whenDeleteByIdCorrectThenReturnTrue() {
         Task task = makeTask(7, false);
         task.setId(null);
+        task.setPriority(null);
+        task.setCategories(Set.of());
         taskRepository.save(task);
 
         boolean isDelete = taskRepository.deleteById(task.getId());
