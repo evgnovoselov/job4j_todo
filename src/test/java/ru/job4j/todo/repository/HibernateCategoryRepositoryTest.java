@@ -9,8 +9,10 @@ import ru.job4j.todo.configuration.SessionFactoryConfiguration;
 import ru.job4j.todo.model.Category;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -135,5 +137,37 @@ class HibernateCategoryRepositoryTest {
         boolean isDeleted = repository.deleteById(1);
 
         assertThat(isDeleted).isFalse();
+    }
+
+    @Test
+    void whenFindAllByIdsThenReturnCollection() {
+        List<Category> categories = IntStream.range(1, 4).boxed()
+                .<Category>mapMulti((integer, categoryConsumer) -> {
+                    Category category = new Category();
+                    category.setName("Category " + integer);
+                    categoryConsumer.accept(category);
+                })
+                .peek(categoryRepository::save)
+                .toList();
+
+        Collection<Category> actualCategories = categoryRepository
+                .findAllByIds(Set.of(
+                        categories.get(0).getId(), categories.get(2).getId()
+                ));
+
+        assertThat(actualCategories)
+                .usingRecursiveComparison()
+                .isEqualTo(Set.of(categories.get(0), categories.get(2)));
+    }
+
+    @Test
+    void whenFindAllByIdsAndCrudRepositoryThrowRuntimeExceptionThenReturnEmpty() {
+        CrudRepository crudRepository = mock(CrudRepository.class);
+        HibernateCategoryRepository repository = new HibernateCategoryRepository(crudRepository);
+        doThrow(RuntimeException.class).when(crudRepository).query(any(), any(), any());
+
+        Collection<Category> actualCategories = repository.findAllByIds(Set.of(1, 2));
+
+        assertThat(actualCategories).isEmpty();
     }
 }

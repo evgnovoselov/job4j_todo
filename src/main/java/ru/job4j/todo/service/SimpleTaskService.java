@@ -15,9 +15,9 @@ import ru.job4j.todo.repository.TaskRepository;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -75,9 +75,7 @@ public class SimpleTaskService implements TaskService {
     }
 
     private Set<Category> getCategories(Set<Integer> categoryIds) {
-        return categoryIds.stream()
-                .<Category>mapMulti((categoryId, categoryConsumer) -> categoryRepository.findById(categoryId).ifPresent(categoryConsumer))
-                .collect(Collectors.toSet());
+        return new HashSet<>(categoryRepository.findAllByIds(categoryIds));
     }
 
     @Override
