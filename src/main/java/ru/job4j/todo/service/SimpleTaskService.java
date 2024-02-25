@@ -14,10 +14,8 @@ import ru.job4j.todo.repository.PriorityRepository;
 import ru.job4j.todo.repository.TaskRepository;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.time.ZoneId;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -64,7 +62,7 @@ public class SimpleTaskService implements TaskService {
         if (task.getTitle() == null || task.getTitle().isBlank()) {
             task.setTitle("Задача без названия");
         }
-        task.setCreated(LocalDateTime.now());
+        task.setCreated(LocalDateTime.now(ZoneId.of("UTC")));
         task.setUser(user);
         return taskRepository.save(task);
     }
