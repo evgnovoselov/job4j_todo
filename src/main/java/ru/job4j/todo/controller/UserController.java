@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.UserService;
+import ru.job4j.todo.util.TimeZoneUtil;
 
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping("/users")
@@ -21,15 +22,18 @@ public class UserController {
     @GetMapping("/registration")
     public String getRegistrationPage(Model model) {
         model.addAttribute("user", new User());
+        model.addAttribute("timezones", TimeZoneUtil.getTimeZonesForDisplay());
         return "users/registration";
     }
+
 
     @PostMapping("/registration")
     public String processRegistration(User user, Model model, HttpSession session) {
         boolean isSave = userService.save(user);
         if (!isSave) {
-            model.addAttribute("error", "Пользователь с таким логином уже существует.");
+            model.addAttribute("error", "Пользователь с таким логином уже существует или указан неверный часовой пояс.");
             model.addAttribute("user", user);
+            model.addAttribute("timezones", TimeZoneUtil.getTimeZonesForDisplay());
             return "users/registration";
         }
         session.setAttribute("user", user);

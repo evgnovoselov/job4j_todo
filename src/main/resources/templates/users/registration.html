@@ -14,12 +14,14 @@
     <form th:action="@{/users/registration}" th:object="${user}" method="post">
         <div class="mb-3">
             <label for="inputName" class="form-label">Имя</label>
-            <input type="text" class="form-control" id="inputName" aria-describedby="nameHelp" th:field="*{name}" required>
+            <input type="text" class="form-control" id="inputName" aria-describedby="nameHelp" th:field="*{name}"
+                   required>
             <div id="nameHelp" class="form-text">Введите имя, которое будет отображаться в системе.</div>
         </div>
         <div class="mb-3">
             <label for="inputLogin" class="form-label">Логин</label>
-            <input type="text" class="form-control" id="inputLogin" aria-describedby="loginHelp" th:field="*{login}" required>
+            <input type="text" class="form-control" id="inputLogin" aria-describedby="loginHelp" th:field="*{login}"
+                   required>
             <div id="loginHelp" class="form-text">Введите логин, который будет использоваться для входа в систему.</div>
         </div>
         <div class="mb-3">
@@ -27,6 +29,15 @@
             <input type="password" class="form-control" id="inputPassword" aria-describedby="passwordHelp"
                    th:field="*{password}" required>
             <div id="passwordHelp" class="form-text">Введите надежный пароль для входа в вашу учетную запись.</div>
+        </div>
+        <div class="mb-3">
+            <label for="selectTimezone" class="form-label">Часовой пояс</label>
+            <select class="form-select" id="selectTimezone" aria-describedby="timezoneHelp"
+                    aria-label="Select timezone user" th:field="*{timezone}" required>
+                <option th:each="zone : ${timezones}" th:value="${zone.key}" th:text="${zone.value}">Важно
+                </option>
+            </select>
+            <div id="timezoneHelp" class="form-text">Выберите свой часовой пояс</div>
         </div>
         <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
         <a class="btn btn-secondary" role="button" th:href="@{/users/login}">Войти</a>
