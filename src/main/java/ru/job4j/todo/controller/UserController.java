@@ -11,7 +11,7 @@ import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.UserService;
 import ru.job4j.todo.util.TimeZoneUtil;
 
-import java.util.*;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/users")

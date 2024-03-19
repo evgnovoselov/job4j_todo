@@ -27,7 +27,7 @@ public class SimpleUserService implements UserService {
     }
 
     private void validate(User user) {
-        if (!TimeZoneUtil.getTimeZonesForDisplay().containsKey(user.getTimezone())) {
+        if (!TimeZoneUtil.getTimeZoneIds().contains(user.getTimezone())) {
             throw new IllegalArgumentException("Выбран неправильный часовой пояс.");
         }
     }
