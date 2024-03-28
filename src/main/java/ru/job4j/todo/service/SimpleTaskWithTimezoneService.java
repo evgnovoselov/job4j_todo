@@ -12,10 +12,7 @@ import ru.job4j.todo.repository.TaskRepository;
 import ru.job4j.todo.util.TimeZoneUtil;
 
 import java.time.ZoneId;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,33 +33,29 @@ public class SimpleTaskWithTimezoneService extends SimpleTaskService implements 
     @Override
     public Collection<Task> findAllByOrderByCreatedDesc(String timezoneId) {
         Collection<Task> tasks = findAllByOrderByCreatedDesc();
-        // TODO: 22.03.2024 Duplicate code
         if (TIMEZONE_IDS.contains(timezoneId)) {
-            tasks = tasks.stream()
-                    .peek(task -> task.setCreated(
-                            task.getCreated()
-                                    .atZone(ZoneId.of("UTC"))
-                                    .withZoneSameInstant(ZoneId.of(timezoneId))
-                                    .toLocalDateTime()
-                    ))
-                    .toList();
+            editTasksFieldCreatedToTimezone(tasks, timezoneId);
         }
         return tasks;
+    }
+
+    private static void editTasksFieldCreatedToTimezone(Collection<Task> tasks, String timezoneId) {
+        tasks.forEach(task -> editTaskFieldCreatedToTimezone(task, timezoneId));
+    }
+
+    private static void editTaskFieldCreatedToTimezone(Task task, String timezoneId) {
+        task.setCreated(
+                task.getCreated()
+                        .atZone(ZoneId.of("UTC"))
+                        .withZoneSameInstant(ZoneId.of(timezoneId))
+                        .toLocalDateTime());
     }
 
     @Override
     public Collection<Task> findAllByDoneOrderByCreatedDesc(boolean done, String timezoneId) {
         Collection<Task> tasks = findAllByDoneOrderByCreatedDesc(done);
-        // TODO: 22.03.2024 Duplicate code
         if (TIMEZONE_IDS.contains(timezoneId)) {
-            tasks = tasks.stream()
-                    .peek(task -> task.setCreated(
-                            task.getCreated()
-                                    .atZone(ZoneId.of("UTC"))
-                                    .withZoneSameInstant(ZoneId.of(timezoneId))
-                                    .toLocalDateTime()
-                    ))
-                    .toList();
+            editTasksFieldCreatedToTimezone(tasks, timezoneId);
         }
         return tasks;
     }
@@ -70,14 +63,8 @@ public class SimpleTaskWithTimezoneService extends SimpleTaskService implements 
     @Override
     public Optional<Task> findById(int id, String timezoneId) {
         Optional<Task> taskOptional = findById(id);
-        // TODO: 22.03.2024 Duplicate code
         if (TIMEZONE_IDS.contains(timezoneId)) {
-            taskOptional.ifPresent(task -> task.setCreated(
-                    task.getCreated()
-                            .atZone(ZoneId.of("UTC"))
-                            .withZoneSameInstant(ZoneId.of(timezoneId))
-                            .toLocalDateTime()
-            ));
+            taskOptional.ifPresent(task -> editTaskFieldCreatedToTimezone(task, timezoneId));
         }
         return taskOptional;
     }
@@ -88,7 +75,6 @@ public class SimpleTaskWithTimezoneService extends SimpleTaskService implements 
         if (taskUpdateDtoOptional.isEmpty()) {
             return Optional.empty();
         }
-        // TODO: 22.03.2024 Duplicate code
         if (TIMEZONE_IDS.contains(timezoneId)) {
             Task task = taskMapper.toTask(
                     taskUpdateDtoOptional.get(),
@@ -103,12 +89,7 @@ public class SimpleTaskWithTimezoneService extends SimpleTaskService implements 
                         return priority;
                     }).get()
             );
-            task.setCreated(
-                    task.getCreated()
-                            .atZone(ZoneId.of("UTC"))
-                            .withZoneSameInstant(ZoneId.of(timezoneId))
-                            .toLocalDateTime()
-            );
+            editTaskFieldCreatedToTimezone(task, timezoneId);
             taskUpdateDtoOptional = Optional.of(taskMapper.toTaskUpdateDto(task));
         }
         return taskUpdateDtoOptional;
