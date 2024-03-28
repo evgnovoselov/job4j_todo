@@ -26,7 +26,6 @@ public class UserController {
         return "users/registration";
     }
 
-
     @PostMapping("/registration")
     public String processRegistration(User user, Model model, HttpSession session) {
         boolean isSave = userService.save(user);
