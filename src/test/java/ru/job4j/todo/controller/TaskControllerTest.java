@@ -14,7 +14,7 @@ import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.CategoryService;
 import ru.job4j.todo.service.PriorityService;
-import ru.job4j.todo.service.TaskService;
+import ru.job4j.todo.service.TaskWithTimezoneService;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -23,20 +23,20 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static ru.job4j.todo.util.TaskUtil.makeTask;
 
 class TaskControllerTest {
     private TaskController taskController;
-    private TaskService taskService;
+    private TaskWithTimezoneService taskService;
     private PriorityService priorityService;
     private CategoryService categoryService;
 
     @BeforeEach
     void setUp() {
-        taskService = mock(TaskService.class);
+        taskService = mock(TaskWithTimezoneService.class);
         priorityService = mock(PriorityService.class);
         categoryService = mock(CategoryService.class);
         taskController = new TaskController(taskService, priorityService, categoryService);
@@ -49,10 +49,12 @@ class TaskControllerTest {
                 makeTask(2, true),
                 makeTask(3, true)
         );
-        when(taskService.findAllByOrderByCreatedDesc()).thenReturn(tasks);
-
+        when(taskService.findAllByOrderByCreatedDesc(any())).thenReturn(tasks);
         ConcurrentModel model = new ConcurrentModel();
-        String view = taskController.getAll(model);
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("user", new User());
+
+        String view = taskController.getAll(model, session);
         Object actualTasks = model.getAttribute("tasks");
 
         assertThat(view).isEqualTo("tasks/list");
@@ -66,10 +68,12 @@ class TaskControllerTest {
                 makeTask(2, true),
                 makeTask(3, true)
         );
-        when(taskService.findAllByDoneOrderByCreatedDesc(false)).thenReturn(tasks);
-
+        when(taskService.findAllByDoneOrderByCreatedDesc(anyBoolean(), any())).thenReturn(tasks);
         ConcurrentModel model = new ConcurrentModel();
-        String view = taskController.getAllNew(model);
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("user", new User());
+
+        String view = taskController.getAllNew(model, session);
         Object actualTasks = model.getAttribute("tasks");
 
         assertThat(view).isEqualTo("tasks/list");
@@ -83,10 +87,12 @@ class TaskControllerTest {
                 makeTask(2, true),
                 makeTask(3, true)
         );
-        when(taskService.findAllByDoneOrderByCreatedDesc(true)).thenReturn(tasks);
-
+        when(taskService.findAllByDoneOrderByCreatedDesc(anyBoolean(), any())).thenReturn(tasks);
         ConcurrentModel model = new ConcurrentModel();
-        String view = taskController.getAllDone(model);
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("user", new User());
+
+        String view = taskController.getAllDone(model, session);
         Object actualTasks = model.getAttribute("tasks");
 
         assertThat(view).isEqualTo("tasks/list");
@@ -96,10 +102,12 @@ class TaskControllerTest {
     @Test
     void whenGetByIdPageThenReturnViewWithTask() {
         Task task = makeTask(1, false);
-        when(taskService.findById(anyInt())).thenReturn(Optional.of(task));
-
+        when(taskService.findById(anyInt(), any())).thenReturn(Optional.of(task));
         ConcurrentModel model = new ConcurrentModel();
-        String view = taskController.getById(1, model);
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("user", new User());
+
+        String view = taskController.getById(1, model, session);
         Task actualTask = (Task) model.getAttribute("task");
 
         assertThat(view).isEqualTo("tasks/one");
@@ -108,10 +116,12 @@ class TaskControllerTest {
 
     @Test
     void whenGetByWrongIdThenReturnView404WithMessage() {
-        when(taskService.findById(anyInt())).thenReturn(Optional.empty());
-
+        when(taskService.findById(anyInt(), any())).thenReturn(Optional.empty());
         ConcurrentModel model = new ConcurrentModel();
-        String view = taskController.getById(1, model);
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("user", new User());
+
+        String view = taskController.getById(1, model, session);
         String message = (String) model.getAttribute("message");
 
         assertThat(view).isEqualTo("error/404");
@@ -180,9 +190,8 @@ class TaskControllerTest {
     void whenProcessSetStatusInTaskCorrectThenReturnRedirectTaskPage() {
         Task task = makeTask(7, false);
         when(taskService.setStatusById(task.getId(), true)).thenReturn(true);
-
         ConcurrentModel model = new ConcurrentModel();
-        String view = taskController.processSetStatus(task.getId(), true, model);
+        String view = taskController.processSetStatus(task.getId(), true, model, new MockHttpSession());
 
         assertThat(view).isEqualTo("redirect:/tasks/7");
     }
@@ -191,10 +200,12 @@ class TaskControllerTest {
     void whenProcessSetStatusInTaskWrongThenReturnPageTaskWithAlert() {
         Task task = makeTask(7, false);
         when(taskService.setStatusById(task.getId(), true)).thenReturn(false);
-        when(taskService.findById(task.getId())).thenReturn(Optional.of(task));
-
+        when(taskService.findById(anyInt(), any())).thenReturn(Optional.of(task));
         ConcurrentModel model = new ConcurrentModel();
-        String view = taskController.processSetStatus(task.getId(), true, model);
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("user", new User());
+
+        String view = taskController.processSetStatus(task.getId(), true, model, session);
         Boolean hasAlert = (Boolean) model.getAttribute("hasAlert");
 
         assertThat(view).isEqualTo("tasks/one");
@@ -206,7 +217,7 @@ class TaskControllerTest {
         when(taskService.deleteById(anyInt())).thenReturn(true);
 
         ConcurrentModel model = new ConcurrentModel();
-        String view = taskController.processDeleteById(1, model);
+        String view = taskController.processDeleteById(1, model, new MockHttpSession());
 
         assertThat(view).isEqualTo("tasks/successDelete");
     }
@@ -214,10 +225,12 @@ class TaskControllerTest {
     @Test
     void whenProcessDeleteTaskWrongThenReturnPageTaskWithAlert() {
         when(taskService.deleteById(anyInt())).thenReturn(false);
-        when(taskService.findById(anyInt())).thenReturn(Optional.of(new Task()));
-
+        when(taskService.findById(anyInt(), any())).thenReturn(Optional.of(new Task()));
         ConcurrentModel model = new ConcurrentModel();
-        String view = taskController.processDeleteById(1, model);
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("user", new User());
+
+        String view = taskController.processDeleteById(1, model, session);
         Boolean hasAlert = (Boolean) model.getAttribute("hasAlert");
 
         assertThat(view).isEqualTo("tasks/one");
@@ -233,12 +246,14 @@ class TaskControllerTest {
         );
         Set<Priority> priorities = Set.of(new Priority());
         Set<Category> categories = Set.of(new Category());
-        when(taskService.getTaskUpdateDtoById(taskUpdateDto.id())).thenReturn(Optional.of(taskUpdateDto));
+        when(taskService.getTaskUpdateDtoById(anyInt(), any())).thenReturn(Optional.of(taskUpdateDto));
         when(priorityService.findAllByOrderByPosition()).thenReturn(priorities);
         when(categoryService.findAll()).thenReturn(categories);
-
         ConcurrentModel model = new ConcurrentModel();
-        String view = taskController.updateById(taskUpdateDto.id(), model);
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("user", new User());
+
+        String view = taskController.updateById(taskUpdateDto.id(), model, session);
         TaskUpdateDto actualTask = (TaskUpdateDto) model.getAttribute("task");
         Set<Priority> actualPriorities = (Set<Priority>) model.getAttribute("priorities");
         Set<Category> actualCategories = (Set<Category>) model.getAttribute("categories");
@@ -251,10 +266,12 @@ class TaskControllerTest {
 
     @Test
     void whenGetPageUpdateByIdNoCorrectIdThenGetPage404WithMessage() {
-        when(taskService.findById(anyInt())).thenReturn(Optional.empty());
-
+        when(taskService.findById(anyInt(), any())).thenReturn(Optional.empty());
         ConcurrentModel model = new ConcurrentModel();
-        String view = taskController.updateById(1, model);
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("user", new User());
+
+        String view = taskController.updateById(1, model, session);
         String message = (String) model.getAttribute("message");
 
         assertThat(view).isEqualTo("error/404");
