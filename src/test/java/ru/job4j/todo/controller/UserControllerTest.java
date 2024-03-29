@@ -60,7 +60,7 @@ class UserControllerTest {
         User actualUser = (User) model.getAttribute("user");
 
         assertThat(view).isEqualTo("users/registration");
-        assertThat(error).isEqualTo("Пользователь с таким логином уже существует.");
+        assertThat(error).isEqualTo("Пользователь с таким логином уже существует или указан неверный часовой пояс.");
         assertThat(actualUser).usingRecursiveComparison().isEqualTo(user);
     }
 
