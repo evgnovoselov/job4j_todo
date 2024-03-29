@@ -27,8 +27,10 @@ class SimpleUserServiceTest {
     @Test
     void whenSaveUserCorrectReturnTrue() {
         when(userRepository.save(any(User.class))).thenReturn(true);
+        User user = new User();
+        user.setTimezone("UTC");
 
-        boolean isSave = userService.save(new User());
+        boolean isSave = userService.save(user);
 
         assertThat(isSave).isTrue();
     }
@@ -38,6 +40,17 @@ class SimpleUserServiceTest {
         when(userRepository.save(any(User.class))).thenReturn(false);
 
         boolean isSave = userService.save(new User());
+
+        assertThat(isSave).isFalse();
+    }
+
+    @Test
+    void whenSaveUserNotValidateTimezoneReturnFalse() {
+        when(userRepository.save(any(User.class))).thenReturn(true);
+        User user = new User();
+        user.setTimezone("Not_Valid_Timezone");
+
+        boolean isSave = userService.save(user);
 
         assertThat(isSave).isFalse();
     }
